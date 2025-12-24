@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لغة الإشارة اليمنية - مسجل الإشارات | Yemeni Sign Language Recorder</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Loading Overlay Styles -->
+    <style>
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 18, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 242, 234, 0.3);
+            border-top: 4px solid #00f2ea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: #fff;
+            margin-top: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.2rem;
+        }
+
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        #error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 80, 0.9);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 10000;
+            font-family: 'Segoe UI', sans-serif;
+            display: none;
+            max-width: 90%;
+        }
+
+        #error-message h3 {
+            margin: 0 0 10px 0;
+        }
+
+        #error-message p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        #error-message button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: white;
+            color: #ff0050;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            #app-container {
+                flex-direction: column;
+            }
+
+            #avatar-stage {
+                width: 100%;
+                height: 50vh;
+            }
+
+            #control-panel {
+                width: 100%;
+            }
+
+            #debug-canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body class="yemeni-theme">
+
+    <!-- Loading Overlay (hidden by default) -->
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <div class="loading-text">جارٍ تحميل الذكاء الاصطناعي...</div>
+        <div class="loading-subtext">Loading AI Models...</div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message">
+        <h3>⚠️ خطأ في الكاميرا</h3>
+        <p>Camera access was denied. Please allow camera access and try again.</p>
+        <button onclick="location.reload()">إعادة المحاولة | Retry</button>
+    </div>
+
+    <div id="app-container">
+        <a href="welcome.html"
+            style="position: absolute; top: 20px; left: 20px; color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); z-index: 1000; font-family: sans-serif;">←
+            Back | عودة</a>
+        <!-- Left: Avatar Stage -->
+        <div id="avatar-stage">
+            <a-scene embedded vr-mode-ui="enabled: false">
+                <a-asset>
+                    <video id="input_video" width="1280" height="720" autoplay muted></video>
+                    <video src="squat.mp4" id="input_video1" loop="true" width="100" height="200"></video>
+                    <video src="stretching.mp4" id="input_video2" loop="true" width="200" height="100"></video>
+                </a-asset>
+
+                <!-- Lighting -->
+                <a-entity light="type: ambient; color: #BBB; intensity: 0.5"></a-entity>
+                <a-entity light="type: directional; color: #FFF; intensity: 0.8; castShadow: true"
+                    position="-0.5 1 1"></a-entity>
+                <a-entity light="type: point; color: #00f2ea; intensity: 0.5; distance: 10" position="2 2 2"></a-entity>
+                <a-entity light="type: point; color: #ff0050; intensity: 0.5; distance: 10"
+                    position="-2 2 2"></a-entity>
+
+                <a-sky color="#1a1a2e"></a-sky> <!-- Dark background matching theme -->
+
+                <!-- Avatar -->
+                <!-- Scaled up significantly (1.7) and positioned to show knees-up -->
+                <a-gltf-model position="0 -1 -1" src="male.glb" id="male" scale="1.7 1.7 1.7"></a-gltf-model>
+
+                <!-- Camera: Focused on Upper Body/Knees -->
+                <a-entity id="camera" camera look-controls="enabled: false" wasd-controls="enabled: false"
+                    position="0 1.4 1.2">
+                    <a-video id="video_entity" visible="false"></a-video>
+                </a-entity>
+            </a-scene>
+            <!-- Debug View for Landmarks -->
+            <canvas id="debug-canvas" width="480" height="270"></canvas>
+        </div>
+
+        <!-- Right: Control Panel -->
+        <div id="control-panel">
+            <h1>Sign Avatar</h1>
+
+            <!-- Navigation Link -->
+            <!-- Navigation Link -->
+            <div
+                style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 0, 80, 0.1); border-radius: 12px; border: 1px solid rgba(255, 0, 80, 0.3);">
+                <a href="welcome.html"
+                    style="color: #ff0050; text-decoration: none; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    🏠 Back to Home | العودة للرئيسية
+                </a>
+            </div>
+
+            <!-- Tracking Source Control -->
+            <h3>Tracking Source</h3>
+            <div class="mode-selector">
+                <button id="btn-cam" class="mode-btn" onclick="toggleSource('camera')">
+                    📷 Camera
+                </button>
+                <button id="btn-vid" class="mode-btn" onclick="toggleSource('video')">
+                    📁 Video
+                </button>
+                <button id="btn-stop" class="mode-btn" onclick="toggleSource('stop')"
+                    style="background: rgba(255, 0, 80, 0.2); color: #ff0050;">
+                    🛑 Stop
+                </button>
+            </div>
+
+            <!-- Face Tracking Toggle -->
+            <div style="margin-bottom: 1rem;">
+                <button id="btn-face" class="mode-btn active" onclick="toggleFaceTracking()"
+                    style="width: 100%; justify-content: center;">
+                    👤 Face Tracking: ON
+                </button>
+            </div>
+
+            <!-- Tracking Speed Slider -->
+            <div
+                style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 242, 234, 0.1); border-radius: 12px; border: 1px solid rgba(0, 242, 234, 0.3);">
+                <label style="display: flex; justify-content: space-between; color: #00f2ea; margin-bottom: 0.5rem;">
+                    <span>⚡ Tracking Speed</span>
+                    <span id="speed-value">85%</span>
+                </label>
+                <input type="range" id="speed-slider" min="20" max="100" value="85"
+                    oninput="updateTrackingSpeed(this.value)" style="width: 100%; accent-color: #00f2ea;">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem;">
+                    <span>Smooth</span>
+                    <span>Fast</span>
+                </div>
+            </div>
+
+            <!-- Mode Switcher -->
+            <h3>Mode</h3>
+            <div class="mode-selector">
+                <button id="btn-recorder" class="mode-btn active" onclick="switchMode('recorder')">Recorder</button>
+                <button id="btn-translator" class="mode-btn" onclick="switchMode('translator')">Translator</button>
+            </div>
+
+            <!-- Recorder Interface -->
+            <div id="recorder-ui">
+                <h3>Recorder Studio</h3>
+                <p class="status-text">Capture your signs and build the dictionary.</p>
+
+                <!-- Hand Mode Selection -->
+                <div
+                    style="margin-bottom: 1rem; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+                    <label style="display:block; color: #00f2ea; margin-bottom: 0.5rem; font-size: 0.9rem;">Active
+                        Hands:</label>
+                    <div style="display: flex; gap: 1rem; justify-content: space-around;">
+                        <label><input type="radio" name="hand-mode" value="both" checked onchange="setHandMode('both')">
+                            Both</label>
+                        <label><input type="radio" name="hand-mode" value="left" onchange="setHandMode('left')"> Left
+                            Only</label>
+                        <label><input type="radio" name="hand-mode" value="right" onchange="setHandMode('right')"> Right
+                            Only</label>
+                    </div>
+                </div>
+
+                <div class="input-group-vertical">
+                    <input type="text" id="anim-name-en" placeholder="English Name (Filename) e.g. hello">
+                    <input type="text" id="anim-name-ar" placeholder="Arabic Name (Label) e.g. مرحبا">
+                </div>
+
+                <button id="record-btn" class="action-btn">Start Recording</button>
+                <button id="stop-btn" class="action-btn" disabled style="background: #333;">Stop</button>
+                <button id="save-btn" class="action-btn" disabled style="background: #333;">Save Animation</button>
+
+                <p id="recorder-status" class="status-text">Ready to record.</p>
+
+                <!-- Hidden Video Input for 'Video' Button -->
+                <input type="file" id="video-upload" accept="video/*" style="display: none;">
+            </div>
+
+            <!-- Translator Interface -->
+            <div id="translator-ui" style="display:none;">
+                <h3>Translator Hub</h3>
+                <p class="status-text">Type text or speak to see the avatar sign it.</p>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle">
+                    <label><input type="radio" name="lang-choice" value="ar" checked> Arabic (عربي)</label>
+                    <label><input type="radio" name="lang-choice" value="en"> English</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="translator-input" placeholder="Type your sentence here...">
+                    <button id="mic-btn" title="Speak">🎤</button>
+                </div>
+
+                <button id="play-btn" class="action-btn">Translate & Play</button>
+
+                <p id="translator-status" class="status-text">Waiting for input...</p>
+            </div>
+
+            <!-- Hidden Original Controls (Required for logic but hidden from UI) -->
+            <div id="original-controls" style="display:none;">
+                <video id="input_video_hidden" width="1280" height="720" autoplay muted></video>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import MediapipeAvatarManager from './src/MediapipeAvatarManager.js'
+        import { RecorderManager } from './src/RecorderManager.js';
+        import { TranslatorManager } from './src/TranslatorManager.js';
+
+        const videoElement = document.getElementById('input_video');
+        const videoElement1 = document.getElementById('input_video1');
+        const videoEntity = document.getElementById('video_entity');
+
+        const avatarManager = new MediapipeAvatarManager();
+
+        // Initialize Managers
+        const recorderManager = new RecorderManager(avatarManager.avatarController);
+        const translatorManager = new TranslatorManager(avatarManager.avatarController);
+
+        // Hook Recorder to AvatarManager
+        avatarManager.onFrameProcessed = (data) => {
+            recorderManager.captureFrame(data);
+        };
+
+        // UI Mode Switching
+        // UI Mode Switching
+        const recorderUI = document.getElementById('recorder-ui');
+        const translatorUI = document.getElementById('translator-ui');
+        const btnRecorder = document.getElementById('btn-recorder');
+        const btnTranslator = document.getElementById('btn-translator');
+
+        function switchMode(mode) {
+            if (mode === 'recorder') {
+                recorderUI.style.display = 'block';
+                translatorUI.style.display = 'none';
+                btnRecorder.classList.add('active');
+                btnTranslator.classList.remove('active');
+            } else if (mode === 'translator') {
+                recorderUI.style.display = 'none';
+                translatorUI.style.display = 'block';
+                btnTranslator.classList.add('active');
+                btnRecorder.classList.remove('active');
+            }
+        }
+        window.switchMode = switchMode;
+
+        // --- Video Source Logic ---
+        let activeSource = 'none'; // 'webcam', 'video', or 'none'
+        let camera = null;
+        let animationFrameId = null;
+
+        const holistic = new Holistic({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+            }
+        });
+
+        holistic.setOptions({
+            modelComplexity: 1, // Balanced: faster loading, still accurate
+            smoothLandmarks: true,
+            enableSegmentation: false,
+            smoothSegmentation: false,
+            refineFaceLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        const debugCanvas = document.getElementById('debug-canvas');
+        const debugCtx = debugCanvas.getContext('2d');
+
+        // ... (Debug drawing code remains, ensuring it draws clearly) ...
+
+        holistic.onResults((results) => {
+            if (activeSource !== 'none') {
+                avatarManager.update(results);
+
+                // --- Debug Drawing (Enhanced) ---
+                try {
+                    debugCtx.save();
+                    debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+
+                    // Draw the video frame
+                    if (results.image) {
+                        debugCtx.drawImage(results.image, 0, 0, debugCanvas.width, debugCanvas.height);
+                    }
+
+                    // Draw Landmarks with elegant style
+                    // Pose (Full body skeleton)
+                    if (results.poseLandmarks && typeof POSE_CONNECTIONS !== 'undefined') {
+                        drawConnectors(debugCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                            { color: '#00f2ea', lineWidth: 3 });
+                        drawLandmarks(debugCtx, results.poseLandmarks,
+                            { color: '#ff0050', lineWidth: 2, radius: 4 });
+                    }
+
+                    // Left Hand - Red/Pink
+                    if (results.leftHandLandmarks && typeof HAND_CONNECTIONS !== 'undefined') {
+                        drawConnectors(debugCtx, results.leftHandLandmarks, HAND_CONNECTIONS,
+                            { color: '#ff0050', lineWidth: 3 });
+                        drawLandmarks(debugCtx, results.leftHandLandmarks,
+                            { color: '#fff', lineWidth: 2, radius: 4 });
+                    }
+
+                    // Right Hand - Cyan
+                    if (results.rightHandLandmarks && typeof HAND_CONNECTIONS !== 'undefined') {
+                        drawConnectors(debugCtx, results.rightHandLandmarks, HAND_CONNECTIONS,
+                            { color: '#00f2ea', lineWidth: 3 });
+                        drawLandmarks(debugCtx, results.rightHandLandmarks,
+                            { color: '#fff', lineWidth: 2, radius: 4 });
+                    }
+
+                    // Face - Orange contours
+                    if (results.faceLandmarks && typeof FACEMESH_CONTOURS !== 'undefined') {
+                        drawConnectors(debugCtx, results.faceLandmarks, FACEMESH_CONTOURS,
+                            { color: '#ffcc00', lineWidth: 2 });
+                    }
+
+                    debugCtx.restore();
+                } catch (e) {
+                    console.error("Debug drawing error:", e);
+                }
+            }
+        });
+
+        // ... (Rest of code) ...
+
+        // Initialize settings
+        avatarManager.setUseHand(true);
+        avatarManager.setUseKalmanFilter(true);
+        avatarManager.setSlerpRatio(0.6); // Balanced: stable yet responsive
+
+        // Webcam Setup with Loading and Error Handling
+        function startWebcam() {
+            console.log("Starting Webcam...");
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loading-overlay');
+            loadingOverlay.classList.remove('hidden');
+
+            // Stop video if playing
+            if (activeSource === 'video') {
+                cancelAnimationFrame(animationFrameId);
+                videoElement1.pause();
+                videoElement1.src = ""; // Unload video
+            }
+            activeSource = 'webcam';
+
+            if (!camera) {
+                camera = new Camera(videoElement, {
+                    onFrame: async () => {
+                        if (activeSource === 'webcam') {
+                            await holistic.send({ image: videoElement });
+                        }
+                    },
+                    width: 1280,
+                    height: 720
+                });
+            }
+
+            camera.start()
+                .then(() => {
+                    // Hide loading after first frame is processed
+                    setTimeout(() => {
+                        loadingOverlay.classList.add('hidden');
+                    }, 1000);
+                })
+                .catch((err) => {
+                    console.error("Camera error:", err);
+                    loadingOverlay.classList.add('hidden');
+                    document.getElementById('error-message').style.display = 'block';
+                });
+        }
+
+        // Video File Setup
+        function startVideoFile(url) {
+            console.log("Starting Video File...");
+            // We don't need to stop camera explicitly as we filter in onFrame, 
+            // but we should ensure we are in video mode.
+            activeSource = 'video';
+
+            videoElement1.src = url;
+            videoElement1.onloadeddata = () => {
+                videoElement1.play();
+                processVideoFrame();
+            };
+        }
+
+        function processVideoFrame() {
+            if (activeSource !== 'video') return;
+
+            if (!videoElement1.paused && !videoElement1.ended) {
+                holistic.send({ image: videoElement1 });
+            }
+
+            // Loop
+            animationFrameId = requestAnimationFrame(processVideoFrame);
+        }
+
+        // Handle Video Upload
+        document.getElementById('video-upload').onchange = function (evt) {
+            const file = this.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                startVideoFile(url);
+                alert("Video loaded. The avatar will now track the video.");
+            }
+        };
+
+        // Avatar Loading
+        const avatarEl = document.getElementById('male');
+        avatarEl.addEventListener('model-loaded', onAvatarLoaded);
+
+        function onAvatarLoaded(evt) {
+            const avatar = this.object3D.children[0];
+            avatarManager.bindAvatar(avatar, 'RPM');
+            console.log("Avatar Loaded. Waiting for user to start tracking.");
+        }
+
+        // Tracking Control Logic
+        function toggleSource(sourceType) {
+            const btnCam = document.getElementById('btn-cam');
+            const btnVid = document.getElementById('btn-vid');
+            const btnStop = document.getElementById('btn-stop');
+
+            if (sourceType === 'camera') {
+                startWebcam();
+                btnCam.classList.add('active');
+                btnVid.classList.remove('active');
+                btnStop.classList.remove('active');
+            } else if (sourceType === 'video') {
+                // Trigger file input
+                document.getElementById('video-upload').click();
+                btnVid.classList.add('active');
+                btnCam.classList.remove('active');
+                btnStop.classList.remove('active');
+            } else if (sourceType === 'stop') {
+                console.log("Stopping Tracking...");
+                activeSource = 'none';
+
+                // Stop Camera (if possible/needed, though we just filter frames)
+                // camera.stop() is not always reliable or necessary if we block send()
+
+                // Stop Video
+                if (videoElement1) {
+                    videoElement1.pause();
+                    videoElement1.src = "";
+                }
+                cancelAnimationFrame(animationFrameId);
+
+                btnStop.classList.add('active');
+                btnCam.classList.remove('active');
+                btnVid.classList.remove('active');
+            }
+        }
+
+        // Expose to global scope for buttons
+        window.toggleSource = toggleSource;
+
+        // Face Tracking Toggle Logic
+        let isFaceTrackingEnabled = true;
+        function toggleFaceTracking() {
+            isFaceTrackingEnabled = !isFaceTrackingEnabled;
+            avatarManager.setUseFace(isFaceTrackingEnabled);
+
+            const btn = document.getElementById('btn-face');
+            if (isFaceTrackingEnabled) {
+                btn.innerHTML = "👤 Face Tracking: ON";
+                btn.classList.add('active');
+            } else {
+                btn.innerHTML = "👤 Face Tracking: OFF";
+                btn.classList.remove('active');
+            }
+        }
+        window.toggleFaceTracking = toggleFaceTracking;
+
+        // Hand Mode Logic
+        window.setHandMode = (mode) => {
+            avatarManager.setHandMode(mode);
+        };
+
+        // Tracking Speed Slider Logic
+        function updateTrackingSpeed(value) {
+            const ratio = value / 100;
+            avatarManager.setSlerpRatio(ratio);
+            document.getElementById('speed-value').textContent = value + '%';
+        }
+        window.updateTrackingSpeed = updateTrackingSpeed;
+
+        // Initialize settings
+        avatarManager.setUseHand(true);
+        avatarManager.setUseKalmanFilter(true); // Enable Kalman Filter for smoother tracking
+        avatarManager.setSlerpRatio(0.6); // Balanced: stable yet responsive
+
+    </script>
+</body>
+
+</html>

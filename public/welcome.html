@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لغة الإشارة اليمنية | Yemeni Sign Language</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Cairo:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- HTTPS Redirect for Mobile Camera Access -->
+    <script>
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #00f2ea;
+            --secondary: #ff0050;
+            --bg: #0a0a12;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', 'Cairo', sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(10, 10, 18, 0.9), rgba(10, 10, 18, 0.95)), url('https://i.pinimg.com/originals/3b/8a/d2/3b8ad2c77d921c25a818732a82326316.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 1400px;
+            width: 95%;
+            animation: fadeIn 1s ease;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 234, 0.3);
+        }
+
+        p.subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4rem;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            width: 320px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .icon {
+            transform: scale(1.1);
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        .card.deaf:hover .icon {
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .card.hearing:hover .icon {
+            text-shadow: 0 0 20px var(--secondary);
+        }
+
+        .card.studio:hover .icon {
+            text-shadow: 0 0 20px #f1c40f;
+        }
+
+        .card.testing:hover .icon {
+            text-shadow: 0 0 20px #9b59b6;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .cards-wrapper {
+                gap: 1rem;
+            }
+
+            .card {
+                width: 100%;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>لغة الإشارة اليمنية</h1>
+        <p class="subtitle">Yemeni Sign Language | اختر وضعك</p>
+
+        <div class="cards-wrapper">
+            <!-- Deaf Mode -->
+            <a href="translator.html" class="card deaf">
+                <div class="icon">🧏‍♂️</div>
+                <h2>أصم / أبكم</h2>
+                <p>Deaf / Mute</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--primary);">
+                    Text to Sign Language<br>تحويل النص إلى لغة إشارة
+                </p>
+            </a>
+
+            <!-- Hearing Mode -->
+            <a href="recognizer.html" class="card hearing">
+                <div class="icon">👂</div>
+                <h2>إنسان طبيعي</h2>
+                <p>Hearing Person</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--secondary);">
+                    Sign Language to Speech<br>تحويل الإشارة إلى صوت
+                </p>
+            </a>
+
+            <!-- Studio Mode -->
+            <a href="recording.html" class="card studio">
+                <div class="icon">🎥</div>
+                <h2>تسجيل الحركات</h2>
+                <p>Avatar Studio</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #f1c40f;">
+                    Record & Edit Animations<br>تسجيل وتعديل الحركات
+                </p>
+            </a>
+
+            <!-- Model Test Mode -->
+            <a href="mlp_test.html" class="card testing">
+                <div class="icon">🧪</div>
+                <h2>اختبار النموذج</h2>
+                <p>Model Test</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #9b59b6;">
+                    Client-Side Inference<br>اختبار الذكاء الاصطناعي
+                </p>
+            </a>
+
+
+        </div>
+    </div>
+
+</body>
+
+</html>

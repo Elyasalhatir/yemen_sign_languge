@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لغة الإشارة اليمنية - المترجم | Yemeni Sign Language Translator</title>
+    <link rel="stylesheet" href="translator-style.css">
+
+    <!-- HTTPS Redirect for Mobile Camera Access -->
+    <script>
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+
+    <div id="translator-container">
+        <!-- Header -->
+        <header>
+            <h1>🤟 Sign Language Translator مترجم لغة الإشارة</h1>
+            <p class="subtitle">Translate text to sign language | ترجمة النص إلى لغة الإشارة</p>
+            <a href="welcome.html" class="back-link">← Back to Home | العودة للرئيسية</a>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Left: Avatar Display -->
+            <div class="avatar-section">
+                <div class="avatar-frame">
+                    <a-scene embedded vr-mode-ui="enabled: false" style="border-radius: 20px;">
+                        <a-asset>
+                            <video id="input_video" width="1280" height="720" autoplay muted
+                                style="display:none;"></video>
+                        </a-asset>
+
+                        <!-- Lighting -->
+                        <a-entity light="type: ambient; color: #BBB; intensity: 0.5"></a-entity>
+                        <a-entity light="type: directional; color: #FFF; intensity: 0.8; castShadow: true"
+                            position="-0.5 1 1"></a-entity>
+                        <a-entity light="type: point; color: #00f2ea; intensity: 0.5; distance: 10"
+                            position="2 2 2"></a-entity>
+                        <a-entity light="type: point; color: #ff0050; intensity: 0.5; distance: 10"
+                            position="-2 2 2"></a-entity>
+
+                        <a-sky color="#1a1a2e"></a-sky>
+
+                        <!-- Avatar -->
+                        <a-gltf-model position="0 -1 -1" src="male.glb" id="male" scale="1.7 1.7 1.7"></a-gltf-model>
+
+                        <!-- Camera -->
+                        <a-entity id="camera" camera look-controls="enabled: false" wasd-controls="enabled: false"
+                            position="0 1.4 1.2">
+                        </a-entity>
+                    </a-scene>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span id="playback-status">Ready | جاهز</span>
+                </div>
+            </div>
+
+            <!-- Right: Control Panel -->
+            <div class="control-section">
+                <div class="control-card">
+                    <h2>🔤 Translation Input | إدخال الترجمة</h2>
+
+                    <!-- Language Selection -->
+                    <div class="lang-selector">
+                        <label class="lang-option">
+                            <input type="radio" name="lang-choice" value="ar" checked>
+                            <span>🇸🇦 العربية</span>
+                        </label>
+                        <label class="lang-option">
+                            <input type="radio" name="lang-choice" value="en">
+                            <span>🇺🇸 English</span>
+                        </label>
+                    </div>
+
+                    <!-- Input Methods -->
+                    <div class="input-group">
+                        <input type="text" id="translator-input"
+                            placeholder="اكتب جملتك هنا... | Type your sentence here...">
+                        <button id="mic-btn" class="mic-button" title="Voice Input | إدخال صوتي">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Translate Button -->
+                    <button id="play-btn" class="translate-btn">
+                        <span class="btn-icon">▶</span>
+                        <span>Translate & Play | ترجم وشغل</span>
+                    </button>
+
+                    <p id="translator-status" class="status-message">Waiting for input... | في انتظار الإدخال...</p>
+                </div>
+
+                <!-- Dictionary Display -->
+                <div class="control-card dictionary-card">
+                    <h2>📚 Available Words | الكلمات المتاحة</h2>
+                    <div class="dictionary-search">
+                        <input type="text" id="dict-search" placeholder="🔍 Search... | بحث...">
+                    </div>
+                    <div id="dictionary-list" class="dictionary-list">
+                        <p class="loading-text">Loading dictionary... | تحميل القاموس...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import MediapipeAvatarManager from './src/MediapipeAvatarManager.js'
+        import { TranslatorManager } from './src/TranslatorManager.js';
+
+        const avatarManager = new MediapipeAvatarManager();
+        const translatorManager = new TranslatorManager(avatarManager.avatarController);
+
+        // Avatar Loading
+        const avatarEl = document.getElementById('male');
+        avatarEl.addEventListener('model-loaded', function (evt) {
+            const avatar = this.object3D.children[0];
+            avatarManager.bindAvatar(avatar, 'RPM');
+            console.log("Avatar Loaded in Translator Mode");
+        });
+
+        // Initialize settings for ultra-smooth animations
+        avatarManager.setUseHand(true);
+        avatarManager.setUseKalmanFilter(true); // Enable for smoother tracking
+        avatarManager.setSlerpRatio(0.15); // Very low for ultra-smooth transitions (was 0.3)
+
+        console.log("Translator mode initialized with ultra-smooth settings");
+
+        // Dictionary Display
+        async function loadAndDisplayDictionary() {
+            try {
+                const response = await fetch('/dictionary.json');
+                if (response.ok) {
+                    const dictionary = await response.json();
+                    displayDictionary(dictionary);
+                }
+            } catch (e) {
+                console.error("Failed to load dictionary:", e);
+                document.getElementById('dictionary-list').innerHTML = '<p class="error-text">Failed to load | فشل التحميل</p>';
+            }
+        }
+
+        function displayDictionary(dictionary) {
+            const listEl = document.getElementById('dictionary-list');
+            const searchEl = document.getElementById('dict-search');
+
+            if (Object.keys(dictionary).length === 0) {
+                listEl.innerHTML = '<p class="empty-text">No words yet | لا توجد كلمات بعد</p>';
+                return;
+            }
+
+            function renderDictionary(filter = '') {
+                const filtered = Object.entries(dictionary).filter(([ar, en]) =>
+                    ar.includes(filter) || en.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                if (filtered.length === 0) {
+                    listEl.innerHTML = '<p class="empty-text">No results | لا توجد نتائج</p>';
+                    return;
+                }
+
+                listEl.innerHTML = filtered.map(([arabic, english]) => `
+                    <div class="dict-item">
+                        <span class="dict-ar">${arabic}</span>
+                        <span class="dict-arrow">→</span>
+                        <span class="dict-en">${english}</span>
+                    </div>
+                `).join('');
+            }
+
+            renderDictionary();
+
+            searchEl.addEventListener('input', (e) => {
+                renderDictionary(e.target.value);
+            });
+        }
+
+        loadAndDisplayDictionary();
+
+    </script>
+</body>
+
+</html>

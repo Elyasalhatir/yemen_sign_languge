@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لغة الإشارة اليمنية - مترجم الإشارات | Yemeni Sign Language Recognizer</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Cairo:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- HTTPS Redirect for Mobile Camera Access -->
+    <script>
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+        }
+    </script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="recognizer-style.css">
+
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header>
+        <a href="welcome.html" class="back-link">← Back | عودة</a>
+        <h1>Sign Recognizer <span class="ar-title">مترجم الإشارة</span></h1>
+        <p class="subtitle">Speak with your hands | تحدث بيديك</p>
+    </header>
+
+    <div class="content-wrapper">
+        <!-- Video Section -->
+        <div class="video-section">
+            <div class="video-frame">
+                <video id="input_video" style="display: none;"></video>
+                <canvas id="output_canvas"></canvas>
+                <div class="loading-overlay" id="loading">
+                    <div class="spinner"></div>
+                    <p>Loading AI Model...</p>
+                </div>
+            </div>
+
+            <div class="status-indicator">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section">
+
+            <!-- Recognition Card -->
+            <div class="result-card">
+                <h2>Recognized Word | الكلمة</h2>
+                <div class="word-display">
+                    <div class="word-en" id="word-en">Waiting...</div>
+                    <div class="word-ar" id="word-ar">...</div>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="conf-fill" style="width: 0%"></div>
+                </div>
+                <div class="conf-text" id="conf-text">0% Confidence</div>
+            </div>
+
+            <!-- Sentence History -->
+            <div class="history-card">
+                <h3>Sentence | الجملة</h3>
+                <div class="sentence-box" id="sentence-box">
+                    Waiting for signs...
+                </div>
+                <div class="controls">
+                    <button class="btn-action btn-speak" onclick="speakSentence()">
+                        🔊 Speak | نطق
+                    </button>
+                    <button class="btn-action btn-ai" onclick="formSentenceAI()">
+                        ✨ AI Sentence
+                    </button>
+                    <button class="btn-action btn-clear" onclick="clearSentence()">
+                        🗑 Clear | مسح
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="info-card">
+                <p>💡 <strong>Tip:</strong> Ensure good lighting and keep your hands visible within the frame.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Logic Script -->
+    <script src="src/RecognizerManager.js"></script>
+</body>
+
+</html>

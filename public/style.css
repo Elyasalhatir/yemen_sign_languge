@@ -1,0 +1,284 @@
+/* Global Reset & Typography */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+:root {
+    --primary-color: #00f2ea;
+    --secondary-color: #ff0050;
+    --bg-color: #0a0a12;
+    /* Global Reset & Typography */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+    :root {
+        --primary-color: #00f2ea;
+        --secondary-color: #ff0050;
+        --bg-color: #0a0a12;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-color: #ffffff;
+        --accent-glow: 0 0 20px rgba(0, 242, 234, 0.5);
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Outfit', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-image:
+            linear-gradient(rgba(10, 10, 18, 0.8), rgba(10, 10, 18, 0.9)),
+            url('https://i.pinimg.com/originals/3b/8a/d2/3b8ad2c77d921c25a818732a82326316.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    /* Main Container */
+    #app-container {
+        display: flex;
+        width: 90vw;
+        height: 90vh;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+
+    /* Avatar Section (Left/Center) */
+    #avatar-stage {
+        flex: 2;
+        position: relative;
+        border-right: 1px solid var(--glass-border);
+        overflow: hidden;
+        /* Legendary Frame Effect */
+        border: 3px solid rgba(0, 242, 234, 0.6);
+        box-shadow:
+            0 0 25px rgba(0, 242, 234, 0.3),
+            inset 0 0 40px rgba(0, 0, 0, 0.6);
+        margin: 20px;
+        border-radius: 25px;
+    }
+
+    /* Decorative Corners */
+    #avatar-stage::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        border: 1px solid rgba(255, 0, 80, 0.4);
+        border-radius: 18px;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    /* Debug Canvas (Landmarks View) */
+    #debug-canvas {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 320px;
+        /* Display size */
+        height: 180px;
+        background: rgba(0, 0, 0, 0.8);
+        /* Darker background to be visible */
+        border: 2px solid rgba(0, 242, 234, 0.5);
+        border-radius: 12px;
+        z-index: 1000;
+        /* Very high z-index */
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        /* Let clicks pass through if needed */
+    }
+
+    /* Control Panel (Right) */
+    #control-panel {
+        flex: 1;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        background: rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+    }
+
+    h1 {
+        font-size: 2rem;
+        background: linear-gradient(90deg, var(--primary-color), #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    h3 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 0.5rem;
+    }
+
+    /* Mode Switcher */
+    .mode-selector {
+        display: flex;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.5rem;
+        border-radius: 12px;
+    }
+
+    .mode-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 1rem;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .mode-btn.active {
+        background: var(--primary-color);
+        color: #000;
+        box-shadow: var(--accent-glow);
+    }
+
+    .mode-btn:hover:not(.active) {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Inputs & Buttons */
+    input[type="text"] {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    button.action-btn {
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1rem;
+        background: linear-gradient(45deg, var(--secondary-color), #ff5e90);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button.action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 0, 80, 0.4);
+    }
+
+    button.action-btn:disabled {
+        background: #333;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Mic Button */
+    #mic-btn {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 0.8rem;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-left: 0.5rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #mic-btn:hover {
+        background: rgba(0, 242, 234, 0.1);
+        box-shadow: 0 0 10px var(--primary-color);
+    }
+
+    #mic-btn.listening {
+        background: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: white;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 0, 80, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 0, 80, 0);
+        }
+    }
+
+    /* Status Text */
+    .status-text {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    /* File Upload */
+    .file-upload-section {
+        margin-top: 2rem;
+        padding: 1rem;
+        border: 1px dashed var(--glass-border);
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    /* Hide original controls but keep functionality */
+    #original-controls {
+        opacity: 0.5;
+        pointer-events: none;
+        display: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
