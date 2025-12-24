@@ -282,3 +282,68 @@
     ::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.2);
     }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        #app-container {
+            flex-direction: column;
+            height: auto;
+            min-height: 100vh;
+            width: 100%;
+            border-radius: 0;
+            border: none;
+            overflow: visible;
+            /* Ensure no clipping */
+        }
+
+        #avatar-stage {
+            height: 65vh;
+            /* Increase height for better visibility */
+            min-height: 400px;
+            width: 100%;
+            margin: 0;
+            border-right: none;
+            border-bottom: 2px solid var(--primary-color);
+            border-radius: 0;
+            flex: none;
+            /* Do not flex, take fixed height */
+        }
+
+        #control-panel {
+            width: 100%;
+            flex: none;
+            height: auto;
+            padding-bottom: 3rem;
+            overflow: visible;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            overflow-y: auto !important;
+            /* Force scrolling */
+            height: auto !important;
+            display: block;
+        }
+
+        #app-container {
+            overflow: visible;
+            display: flex;
+        }
+
+        #debug-canvas {
+            width: 120px;
+            height: 67px;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .mode-selector {
+            flex-wrap: wrap;
+        }
+    }

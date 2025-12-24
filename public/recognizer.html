@@ -37,7 +37,14 @@
 
 <body>
     <header>
-        <a href="welcome.html" class="back-link">← Back | عودة</a>
+        <div style="position: absolute; top: 20px; left: 20px; z-index: 1000; display: flex; gap: 10px;">
+            <a href="welcome.html" class="back-link" style="position: relative; top: 0; left: 0;">← Back | عودة</a>
+
+            <button id="camera-switch-btn" onclick="switchCamera()"
+                style="background: rgba(0, 242, 234, 0.2); border: 1px solid #00f2ea; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 1.2rem;">
+                📷
+            </button>
+        </div>
         <h1>Sign Recognizer <span class="ar-title">مترجم الإشارة</span></h1>
         <p class="subtitle">Speak with your hands | تحدث بيديك</p>
     </header>

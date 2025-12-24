@@ -169,17 +169,37 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                padding: 2rem 0;
+                display: block;
+                /* Remove flex centering to allow normal flow */
+            }
+
+            .container {
+                margin: 0 auto;
+                padding-bottom: 2rem;
+            }
+
             h1 {
                 font-size: 2.5rem;
+                margin-top: 1rem;
             }
 
             .cards-wrapper {
-                gap: 1rem;
+                gap: 1.5rem;
+                padding: 0 1rem;
             }
 
             .card {
                 width: 100%;
+                max-width: 350px;
+                /* Limit max width for better aesthetic */
                 padding: 2rem;
+                margin: 0 auto;
+                /* Center cards */
             }
         }
     </style>

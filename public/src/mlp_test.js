@@ -361,6 +361,8 @@ function speak(text, lang = 'ar') {
 
 // ----------------Initialization----------------
 
+// ----------------Initialization----------------
+
 holistic = new Holistic({
     locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -376,13 +378,42 @@ holistic.setOptions({
 
 holistic.onResults(onResults);
 
-camera = new Camera(videoElement, {
-    onFrame: async () => {
-        await holistic.send({ image: videoElement });
-    },
-    width: 640,  // Standard resolution
-    height: 480
-});
+let currentFacingMode = 'user';
+
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Show button on mobile
+if (isMobile()) {
+    const switchBtn = document.getElementById('camera-switch-btn');
+    if (switchBtn) switchBtn.style.display = 'flex';
+}
+
+window.switchCamera = async function () {
+    currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    if (camera) {
+        await camera.stop();
+        camera = null;
+    }
+    await initCamera();
+};
+
+async function initCamera() {
+    camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await holistic.send({ image: videoElement });
+        },
+        width: 640,
+        height: 480,
+        facingMode: currentFacingMode
+    });
+
+    // If we are already running, start it immediately
+    if (document.getElementById('btn-start').style.display === 'none') {
+        await camera.start();
+    }
+}
 
 // Start Button Logic
 const startBtn = document.getElementById('btn-start');
@@ -396,6 +427,7 @@ startBtn.addEventListener('click', async () => {
     await new Promise(r => setTimeout(r, 100));
 
     try {
+        if (!camera) await initCamera();
         await camera.start();
         console.log("Camera started.");
         startBtn.style.display = 'none'; // Hide button after start
@@ -413,3 +445,4 @@ startBtn.addEventListener('click', async () => {
 });
 
 loadModel();
+

@@ -374,18 +374,45 @@ function onResults(results) {
 
 // ---------------- CAMERA ----------------
 
-const camera = new Camera(videoElement, {
-    onFrame: async () => {
-        await holistic.send({ image: videoElement });
-    },
-    width: 1280,
-    height: 720
-});
+// ---------------- CAMERA ----------------
+let camera;
+let currentFacingMode = 'user';
+
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Show button on mobile
+if (isMobile()) {
+    const switchBtn = document.getElementById('camera-switch-btn');
+    if (switchBtn) switchBtn.style.display = 'flex';
+}
+
+window.switchCamera = async function () {
+    currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    if (camera) {
+        await camera.stop();
+        camera = null;
+    }
+    startCamera();
+};
+
+function startCamera() {
+    camera = new Camera(videoElement, {
+        onFrame: async () => {
+            await holistic.send({ image: videoElement });
+        },
+        width: 1280,
+        height: 720,
+        facingMode: currentFacingMode
+    });
+    camera.start();
+}
 
 // Initialize
 async function init() {
     await loadModel();
-    camera.start();
+    startCamera();
 }
 
 init();
