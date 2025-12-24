@@ -2,7 +2,7 @@ import express from 'express';
 import { fileURLToPath } from "url";
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
