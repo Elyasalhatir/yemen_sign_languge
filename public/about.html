@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>من نحن | لغة الإشارة اليمنية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ea;
+            --secondary: #ff0050;
+            --gold: #f1c40f;
+            --bg: #0a0a12;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .bg-animation::before,
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .bg-animation::before {
+            background: var(--primary);
+            top: 20%;
+            left: 10%;
+        }
+
+        .bg-animation::after {
+            background: var(--secondary);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            text-decoration: none;
+            background: var(--glass);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: #0a0a12;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--primary), var(--gold), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* About Card */
+        .about-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .about-card h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-card p {
+            font-size: 1.2rem;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* University Badge */
+        .university-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.2), rgba(255, 0, 80, 0.2));
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            margin: 2rem 0;
+            border: 1px solid var(--primary);
+        }
+
+        .university-badge span {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* Team Section */
+        .team-section {
+            margin: 3rem 0;
+        }
+
+        .team-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-member {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 242, 234, 0.2);
+        }
+
+        .team-member .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .team-member h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: white;
+        }
+
+        .team-member .title {
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+
+        /* Supervisors */
+        .supervisors {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .supervisors h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .supervisor-list {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .supervisor {
+            background: linear-gradient(135deg, rgba(255, 0, 80, 0.1), rgba(241, 196, 15, 0.1));
+            padding: 1.5rem 2.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--secondary);
+        }
+
+        .supervisor h3 {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .supervisor .role {
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer .heart {
+            color: var(--secondary);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .about-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+
+            .supervisor-list {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="header">
+        <a href="welcome.html" class="back-btn">→ العودة للرئيسية</a>
+        <div class="logo">🤟</div>
+        <h1>من نحن</h1>
+        <p class="subtitle">About Us</p>
+    </div>
+
+    <div class="container">
+        <!-- About Card -->
+        <div class="about-card">
+            <h2>🎓 مشروع تخرج</h2>
+            <p>
+                نحن مجموعة من طلاب كلية الهندسة - قسم الحاسبات والتحكم الآلي
+                <br>
+                قمنا بتطوير هذا المشروع لخدمة مجتمع الصم والبكم في اليمن
+                <br>
+                وتسهيل التواصل بين الأشخاص السامعين وذوي الإعاقة السمعية
+            </p>
+
+            <div class="university-badge">
+                <span>🏛️</span>
+                <span>جامعة إب - كلية الهندسة</span>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-section">
+            <h2>👨‍💻 فريق العمل</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>م. عبدالرحمن السريحي</h3>
+                    <p class="title">مطور</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>م. حمزة الشامي</h3>
+                    <p class="title">مطور</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>م. أحمد ثامر</h3>
+                    <p class="title">مطور</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>م. إبراهيم فايز</h3>
+                    <p class="title">مطور</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>م. إلياس امين الهتار</h3>
+                    <p class="title">مطور</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supervisors -->
+        <div class="supervisors">
+            <h2>👨‍🏫 تحت إشراف</h2>
+            <div class="supervisor-list">
+                <div class="supervisor">
+                    <h3>أ.د. فرحان نشوان</h3>
+                    <p class="role">المشرف الأول</p>
+                </div>
+                <div class="supervisor">
+                    <h3>د. إبراهيم حسان</h3>
+                    <p class="role">المشرف المشارك</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>صُنع بكل <span class="heart">❤️</span> في اليمن</p>
+        <p style="margin-top: 0.5rem;">2024 © جميع الحقوق محفوظة</p>
+    </div>
+</body>
+
+</html>
