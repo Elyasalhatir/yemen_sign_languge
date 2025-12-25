@@ -26,8 +26,19 @@ class MediapipeAvatarManager {
         // Left arm: rotate 90° around Z = [0, 0, -0.707, 0.707]
         // Right arm: rotate -90° around Z = [0, 0, 0.707, 0.707]
 
-        const leftArmRestPose = [0, 0, -0.707, 0.707];   // Left arm straight down
-        const rightArmRestPose = [0, 0, 0.707, 0.707];   // Right arm straight down
+        const leftArmRestPose = [
+
+            -0.61399834628026,
+            -0.03265262181783936,
+            -0.05087395459098704,
+            -0.7869889947115586
+
+        ];   // Left arm straight down
+        const rightArmRestPose = [-2.7001974115927527e-07,
+            6.2434801324079984e-09,
+        -0.012369377914897164,
+            0.9999234963185563
+        ];   // Right arm straight down
         const foreArmStraight = [0, 0, 0, 1];            // Forearm straight (identity)
 
         // Handle untracked hands (when landmarks not detected)
