@@ -63,7 +63,26 @@ app.post('/save-animation', (req, res) => {
             console.log(`Saved animation: ${englishName}`);
             res.send('Animation saved successfully');
         }
+
     });
+});
+
+// List Avatars Endpoint
+app.get('/list-avatars', (req, res) => {
+    const avatarsDir = __dirname + '/public/avatars';
+    if (fs.existsSync(avatarsDir)) {
+        fs.readdir(avatarsDir, (err, files) => {
+            if (err) {
+                console.error("Error scanning avatars directory:", err);
+                return res.status(500).json({ error: 'Failed to scan avatars' });
+            }
+            // Filter for .glb or .gltf files
+            const avatarFiles = files.filter(file => file.endsWith('.glb') || file.endsWith('.gltf'));
+            res.json(avatarFiles);
+        });
+    } else {
+        res.json([]); // Return empty list if dir doesn't exist
+    }
 });
 
 app.get('/', (req, res) => {

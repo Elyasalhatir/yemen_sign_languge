@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لغة الإشارة اليمنية - Universal Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a12;
+        }
+
+        #app-container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #avatar-stage {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #05050a 100%);
+        }
+
+        #control-panel {
+            width: 450px;
+            min-width: 380px;
+            background: rgba(10, 10, 20, 0.98);
+            border-left: 1px solid rgba(0, 242, 234, 0.3);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .studio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Accordion */
+        .accordion-item {
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .accordion-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #00f2ea;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .accordion-header:hover {
+            background: rgba(0, 242, 234, 0.1);
+        }
+
+        .accordion-header i {
+            transition: transform 0.2s;
+        }
+
+        .accordion-header.active i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .control-row {
+            margin-bottom: 1.2rem;
+        }
+
+        .control-row label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.4rem;
+        }
+
+        .control-row label span {
+            color: #00f2ea;
+            font-family: monospace;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00f2ea;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            appearance: none;
+        }
+
+        /* Timeline Bar */
+        #timeline-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 130px;
+            background: rgba(5, 5, 10, 0.95);
+            border-top: 2px solid #00f2ea;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            gap: 1.5rem;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .timeline-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            min-width: 180px;
+        }
+
+        .frame-strip {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            height: 80px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-frame {
+            min-width: 50px;
+            height: 100%;
+            background: #1a1a2e;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .timeline-frame:hover {
+            border-color: #00f2ea;
+            color: #fff;
+        }
+
+        .timeline-frame.active {
+            background: #00f2ea;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.5);
+        }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid #ff0050;
+            color: #ff0050;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .btn-reset:hover {
+            background: #ff0050;
+            color: #fff;
+        }
+
+        @media (max-width: 900px) {
+            #app-container {
+                flex-direction: column;
+            }
+
+            #avatar-stage {
+                height: 40vh;
+                flex: none;
+            }
+
+            #control-panel {
+                width: 100%;
+                flex: 1;
+                border-left: none;
+                border-top: 2px solid #00f2ea;
+            }
+
+            #timeline-bar {
+                height: auto;
+                padding: 10px;
+                flex-direction: column;
+            }
+
+            .timeline-controls {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="yemeni-theme">
+    <div id="app-container">
+        <!-- Floating Back Button -->
+        <a href="welcome.html"
+            style="position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1001; background: rgba(0,0,0,0.8); color: white; text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 30px; border: 2px solid #00f2ea; font-weight: bold; backdrop-filter: blur(10px);">
+            ← Back | خروج
+        </a>
+
+        <!-- Stage Area -->
+        <div id="avatar-stage">
+            <a-scene embedded vr-mode-ui="enabled: false">
+                <a-entity light="type: ambient; color: #BBB; intensity: 0.7"></a-entity>
+                <a-entity light="type: directional; color: #FFF; intensity: 1.0" position="-1 2 1"></a-entity>
+                <a-sky color="#05050a"></a-sky>
+
+                <a-gltf-model position="0 -1.1 -1" src="avatars/male.glb" id="avatar"
+                    scale="1.7 1.7 1.7"></a-gltf-model>
+                <a-entity id="camera" camera position="0 1.4 1.2"></a-entity>
+            </a-scene>
+
+            <!-- Timeline -->
+            <div id="timeline-bar">
+                <div class="timeline-controls">
+                    <button class="action-btn" onclick="captureFrame()">📸 Capture</button>
+                    <button class="action-btn" onclick="deleteLastFrame()" style="background: #333;">🔙 Undo</button>
+                    <button class="action-btn" onclick="playAnimation()" style="background: #2E7D32;">▶ Play</button>
+                    <button class="action-btn" onclick="stopAnimation()" style="background: #C62828;">⏹ Stop</button>
+                </div>
+                <div class="frame-strip" id="frame-trip">
+                    <span>Captured frames will appear here...</span>
+                </div>
+                <button class="action-btn" onclick="resetPose()" style="background: #ff0050; min-width: 120px;">🔄 Reset
+                    Pose</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div id="control-panel">
+            <div class="studio-header">
+                <div>
+                    <h1 style="font-size: 1.4rem; margin:0;">Universal Studio</h1>
+                    <span style="color:#888; font-size: 0.8rem;">تحكم شامل بكامل الهيكل العظمي</span>
+                </div>
+                <div style="text-align:right">
+                    <label style="font-size:0.8rem; display:block; margin-bottom:5px;">🔗 Sync</label>
+                    <input type="checkbox" id="mirror-mode" style="width:22px; height:22px;">
+                </div>
+            </div>
+
+            <!-- Avatar Selection & Save -->
+            <div class="accordion-item" style="border-color: #00f2ea;">
+                <div class="accordion-header" onclick="toggleAccordion(this)">⚙️ Project Settings <span>▼</span></div>
+                <div class="accordion-content" style="display:block;">
+                    <label style="font-size:0.8rem; color:#aaa;">Select Character (اختر الشخصية)</label>
+                    <select id="avatar-selector" onchange="window.changeAvatar(this.value)"
+                        style="width:100%; margin-bottom:1rem; padding:0.6rem; background:#111; color:#fff; border:1px solid #333; border-radius:4px;"></select>
+
+                    <input type="text" id="anim-name-en" placeholder="Animation Name (English)"
+                        style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#000; color:#fff; border:1px solid #333;">
+                    <input type="text" id="anim-name-ar" placeholder="اسم الحركة (عربي)"
+                        style="width:100%; margin-bottom:1rem; padding:0.6rem; background:#000; color:#fff; border:1px solid #333; direction:rtl;">
+                    <button class="action-btn" onclick="saveAnimation()" style="width:100%;">💾 Save Animation</button>
+                </div>
+            </div>
+
+            <div id="controls-list">
+                <!-- Head -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">👤 Head & Neck (الرأس والرقبة)
+                        <span>▼</span></div>
+                    <div class="accordion-content">
+                        <div class="control-row"><label>Neck Turn (التفات)</label><input type="range"
+                                class="bone-control" data-bone="Neck" data-axis="y" min="-1" max="1" step="0.05"></div>
+                        <div class="control-row"><label>Head Nod (إيماء)</label><input type="range" class="bone-control"
+                                data-bone="Head" data-axis="x" min="-0.6" max="0.6" step="0.05"></div>
+                        <div class="control-row"><label>Head Tilt (ميلان)</label><input type="range"
+                                class="bone-control" data-bone="Head" data-axis="z" min="-0.4" max="0.4" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spine & Core -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">🧘 Spine & Core (الجذع) <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="control-row"><label>Spine Bend (انحناء)</label><input type="range"
+                                class="bone-control" data-bone="Spine" data-axis="x" min="-0.5" max="0.5" step="0.05">
+                        </div>
+                        <div class="control-row"><label>Spine Twist (التواء)</label><input type="range"
+                                class="bone-control" data-bone="Spine" data-axis="y" min="-0.5" max="0.5" step="0.05">
+                        </div>
+                        <div class="control-row"><label>Hips Center (الأرداف)</label><input type="range"
+                                class="bone-control" data-bone="Hips" data-axis="y" min="-0.5" max="0.5" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arms Header (Dynamic Content might be better but let's hardcode for stability) -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">💪 Arms (الأذرع) <span>▼</span></div>
+                    <div class="accordion-content">
+                        <h4 style="color:#aaa; border-bottom:1px solid #333; padding-bottom:5px;">Right Arm (الأيمن)
+                        </h4>
+                        <div class="control-row"><label>Shoulder X/Y/Z</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="range" class="bone-control" data-bone="RightArm" data-axis="x" min="-2"
+                                    max="2" step="0.1" title="X">
+                                <input type="range" class="bone-control" data-bone="RightArm" data-axis="y" min="-2"
+                                    max="2" step="0.1" title="Y">
+                                <input type="range" class="bone-control" data-bone="RightArm" data-axis="z" min="-2"
+                                    max="2" step="0.1" title="Z">
+                            </div>
+                        </div>
+                        <div class="control-row"><label>Forearm Bend (Elbow)</label><input type="range"
+                                class="bone-control" data-bone="RightForeArm" data-axis="x" min="-2.5" max="0"
+                                step="0.1"></div>
+                        <div class="control-row"><label>Hand Wrist X/Y/Z</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="range" class="bone-control" data-bone="RightHand" data-axis="x" min="-1.5"
+                                    max="1.5" step="0.1">
+                                <input type="range" class="bone-control" data-bone="RightHand" data-axis="y" min="-1.5"
+                                    max="1.5" step="0.1">
+                                <input type="range" class="bone-control" data-bone="RightHand" data-axis="z" min="-1.5"
+                                    max="1.5" step="0.1">
+                            </div>
+                        </div>
+
+                        <h4 style="color:#aaa; border-bottom:1px solid #333; padding-bottom:5px; margin-top:20px;">Left
+                            Arm (الأيسر)</h4>
+                        <div class="control-row"><label>Shoulder X/Y/Z</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="range" class="bone-control" data-bone="LeftArm" data-axis="x" min="-2"
+                                    max="2" step="0.1">
+                                <input type="range" class="bone-control" data-bone="LeftArm" data-axis="y" min="-2"
+                                    max="2" step="0.1">
+                                <input type="range" class="bone-control" data-bone="LeftArm" data-axis="z" min="-2"
+                                    max="2" step="0.1">
+                            </div>
+                        </div>
+                        <div class="control-row"><label>Forearm Bend (Elbow)</label><input type="range"
+                                class="bone-control" data-bone="LeftForeArm" data-axis="x" min="-2.5" max="0"
+                                step="0.1"></div>
+                        <div class="control-row"><label>Hand Wrist X/Y/Z</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="range" class="bone-control" data-bone="LeftHand" data-axis="x" min="-1.5"
+                                    max="1.5" step="0.1">
+                                <input type="range" class="bone-control" data-bone="LeftHand" data-axis="y" min="-1.5"
+                                    max="1.5" step="0.1">
+                                <input type="range" class="bone-control" data-bone="LeftHand" data-axis="z" min="-1.5"
+                                    max="1.5" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Natural Fingers -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">🖐️ Human Hands (تحكم يدوي طبيعي)
+                        <span>▼</span></div>
+                    <div class="accordion-content">
+                        <p style="color:#777; font-size:0.75rem; margin-bottom:1rem;">تحكم يحاكي حركة البشر الطبيعية عبر
+                            دمج مفاصل الإصبع</p>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div>
+                                <h4 style="color:#00f2ea;">Right (يمين)</h4>
+                                <div class="control-row"
+                                    style="background:rgba(0,242,234,0.1); padding:5px; border-radius:4px;"><label>✊
+                                        Fist (قبضة)</label><input type="range" class="fist-control" data-hand="Right"
+                                        min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Thumb</label><input type="range" class="finger-curl"
+                                        data-hand="Right" data-finger="Thumb" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Index</label><input type="range" class="finger-curl"
+                                        data-hand="Right" data-finger="Index" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Middle</label><input type="range" class="finger-curl"
+                                        data-hand="Right" data-finger="Middle" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Ring</label><input type="range" class="finger-curl"
+                                        data-hand="Right" data-finger="Ring" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Pinky</label><input type="range" class="finger-curl"
+                                        data-hand="Right" data-finger="Pinky" min="0" max="1" step="0.05"></div>
+                            </div>
+                            <div>
+                                <h4 style="color:#00f2ea;">Left (يسار)</h4>
+                                <div class="control-row"
+                                    style="background:rgba(0,242,234,0.1); padding:5px; border-radius:4px;"><label>✊
+                                        Fist (قبضة)</label><input type="range" class="fist-control" data-hand="Left"
+                                        min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Thumb</label><input type="range" class="finger-curl"
+                                        data-hand="Left" data-finger="Thumb" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Index</label><input type="range" class="finger-curl"
+                                        data-hand="Left" data-finger="Index" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Middle</label><input type="range" class="finger-curl"
+                                        data-hand="Left" data-finger="Middle" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Ring</label><input type="range" class="finger-curl"
+                                        data-hand="Left" data-finger="Ring" min="0" max="1" step="0.05"></div>
+                                <div class="control-row"><label>Pinky</label><input type="range" class="finger-curl"
+                                        data-hand="Left" data-finger="Pinky" min="0" max="1" step="0.05"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legs -->
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">🦵 Legs (الأرجل) <span>▼</span></div>
+                    <div class="accordion-content">
+                        <div class="control-row"><label>Leg Bend (الركبة)</label><input type="range"
+                                class="bone-control" data-bone="RightLeg" data-axis="x" min="0" max="2.5" step="0.1">
+                        </div>
+                        <div class="control-row"><label>Foot Tilt (القدم)</label><input type="range"
+                                class="bone-control" data-bone="RightFoot" data-axis="x" min="-1" max="1" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./src/ManualAvatarManager.js"></script>
+    <script>
+        function toggleAccordion(header) {
+            header.classList.toggle('active');
+            const content = header.nextElementSibling;
+            content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+        }
+
+        async function fetchAvatars() {
+            try {
+                const res = await fetch('/list-avatars');
+                const list = await res.json();
+                const sel = document.getElementById('avatar-selector');
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.text = item.replace('.glb', '');
+                    if (item === 'male.glb') opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            } catch (e) { }
+        }
+        fetchAvatars();
+
+        window.changeAvatar = (val) => {
+            document.getElementById('avatar').setAttribute('src', 'avatars/' + val);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bind bone controls
+            document.querySelectorAll('.bone-control').forEach(s => {
+                s.addEventListener('input', (e) => {
+                    window.manualManager.updateBone(e.target.dataset.bone, e.target.dataset.axis, e.target.value);
+                });
+            });
+
+            // Bind finger curls
+            document.querySelectorAll('.finger-curl').forEach(s => {
+                s.addEventListener('input', (e) => {
+                    window.manualManager.updateFingerCurl(e.target.dataset.hand, e.target.dataset.finger, e.target.value);
+                });
+            });
+
+            // Bind fist master
+            document.querySelectorAll('.fist-control').forEach(s => {
+                s.addEventListener('input', (e) => {
+                    window.manualManager.updateFist(e.target.dataset.hand, e.target.dataset.value || e.target.value);
+                });
+            });
+        });
+
+        // Global bridge for saving
+        window.saveAnimation = () => window.manualManager.saveAnimation();
+    </script>
+</body>
+
+</html>

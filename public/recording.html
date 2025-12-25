@@ -167,7 +167,7 @@
 
                 <!-- Avatar -->
                 <!-- Scaled up significantly (1.7) and positioned to show knees-up -->
-                <a-gltf-model position="0 -1 -1" src="male.glb" id="male" scale="1.7 1.7 1.7"></a-gltf-model>
+                <a-gltf-model position="0 -1 -1" src="avatars/male.glb" id="male" scale="1.7 1.7 1.7"></a-gltf-model>
 
                 <!-- Camera: Focused on Upper Body/Knees -->
                 <a-entity id="camera" camera look-controls="enabled: false" wasd-controls="enabled: false"
@@ -184,6 +184,7 @@
             <h1>Sign Avatar</h1>
 
             <!-- Navigation Link -->
+
             <!-- Navigation Link -->
             <div
                 style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 0, 80, 0.1); border-radius: 12px; border: 1px solid rgba(255, 0, 80, 0.3);">
@@ -191,6 +192,24 @@
                     style="color: #ff0050; text-decoration: none; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
                     🏠 Back to Home | العودة للرئيسية
                 </a>
+            </div>
+
+            <!-- Avatar Selector -->
+            <h3>Avatar Selection</h3>
+            <div
+                style="margin-bottom: 1.5rem; padding: 0.5rem; background: rgba(50, 50, 60, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.5rem;">🧛</span>
+                <select id="avatar-selector" onchange="changeAvatar(this.value)"
+                    style="width: 100%; background: transparent; border: none; color: #fff; font-size: 1rem; cursor: pointer; padding: 0.5rem; outline: none;">
+                    <option value="" disabled selected style="color: #333; background: #fff;">Select Avatar...</option>
+                </select>
+                <!-- Add style tag for options to ensure they are readable in drop down -->
+                <style>
+                    #avatar-selector option {
+                        color: #000;
+                        background: #fff;
+                    }
+                </style>
             </div>
 
             <!-- Tracking Source Control -->
@@ -586,10 +605,81 @@
         }
         window.updateTrackingSpeed = updateTrackingSpeed;
 
+
         // Initialize settings
         avatarManager.setUseHand(true);
         avatarManager.setUseKalmanFilter(true); // Enable Kalman Filter for smoother tracking
         avatarManager.setSlerpRatio(0.6); // Balanced: stable yet responsive
+
+
+        // --- Avatar Switching Logic ---
+        function changeAvatar(filename) {
+            console.log("Switching avatar to:", filename);
+            const avatarEl = document.getElementById('male'); // The a-gltf-model entity
+
+            // Remove existing event listener to prevent duplicate firings if we switch multiple times
+            avatarEl.removeEventListener('model-loaded', onAvatarLoaded);
+
+            // Add new listener (one-time for this load)
+            const newOnLoaded = (evt) => {
+                console.log("New Avatar Loaded:", filename);
+                const avatar = avatarEl.object3D.children[0];
+                if (!avatar) {
+                    console.error("Avatar object not found in loaded model");
+                    return;
+                }
+                // Determine type (defaulting to RPM for now, can be sophisticated later)
+                const type = filename.toLowerCase().includes('robot') ? 'bipedRobot' : 'RPM';
+
+                avatarManager.bindAvatar(avatar, type);
+
+                // Show confirmation or perform any cleanup
+            };
+
+            avatarEl.addEventListener('model-loaded', newOnLoaded, { once: true });
+
+            // Update source
+            // Note: A-frame might cache models. Adding a timestamp could force reload if needed, but not usually for local files.
+            avatarEl.setAttribute('src', `avatars/${filename}`);
+        }
+        window.changeAvatar = changeAvatar;
+
+        async function fetchAvatarList() {
+            try {
+                const response = await fetch('/list-avatars');
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert("⚠️ New feature detection failed.\n\nPlease RESTART your server in the terminal (Ctrl+C, then 'npm start') to enable the specific avatar list.");
+                    }
+                    console.error("Server returned status:", response.status);
+                    return;
+                }
+                const avatars = await response.json();
+                const selector = document.getElementById('avatar-selector');
+
+                // Clear existing options (except the placeholder)
+                selector.innerHTML = '<option value="" disabled selected>Select Avatar...</option>';
+
+                avatars.forEach(avatar => {
+                    const option = document.createElement('option');
+                    option.value = avatar;
+                    option.text = avatar.replace('.glb', '').replace('.gltf', ''); // Display clean name
+
+                    // Pre-select if it matches current (assuming 'male.glb' is default in HTML)
+                    // Or if we want to track current.
+                    if (avatar === 'male.glb') {
+                        // Mark as possibly active or just leave 'Select Avatar...'
+                    }
+
+                    selector.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Failed to fetch avatar list:", err);
+            }
+        }
+
+        // Call on load
+        fetchAvatarList();
 
     </script>
 </body>

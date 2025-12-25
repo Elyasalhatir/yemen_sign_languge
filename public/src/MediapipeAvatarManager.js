@@ -26,19 +26,27 @@ class MediapipeAvatarManager {
         // Left arm: rotate 90° around Z = [0, 0, -0.707, 0.707]
         // Right arm: rotate -90° around Z = [0, 0, 0.707, 0.707]
 
+        // A-Pose (Arms at roughly 45-60 degrees down)
+        // Rotation around Z axis.
+        // Left Arm: approx +60 degrees (rotated down from T-pose) -> Z = sin(60/2) = 0.5
+        // We will use 0.0, 0.0, 0.479, 0.877 (approx 57 degrees) 
+
+        // Let's use clean 60 degrees (PI/3): sin(PI/6)=0.5, cos(PI/6)=0.866
+        // Left Arm Z rotation:
         const leftArmRestPose = [
+            0,
+            0,
+            0.5,
+            0.866
+        ];   // Left arm A-Pose
 
-            -0.61399834628026,
-            -0.03265262181783936,
-            -0.05087395459098704,
-            -0.7869889947115586
-
-        ];   // Left arm straight down
-        const rightArmRestPose = [-2.7001974115927527e-07,
-            6.2434801324079984e-09,
-        -0.012369377914897164,
-            0.9999234963185563
-        ];   // Right arm straight down
+        // Right Arm Z rotation (negative):
+        const rightArmRestPose = [
+            0,
+            0,
+            -0.5,
+            0.866
+        ];   // Right arm A-Pose
         const foreArmStraight = [0, 0, 0, 1];            // Forearm straight (identity)
 
         // Handle untracked hands (when landmarks not detected)
