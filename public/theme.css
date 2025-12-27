@@ -1,0 +1,215 @@
+/* ===== THEME SYSTEM ===== */
+/* Default: Dark Mode */
+:root {
+    --bg-primary: #0d0d1a;
+    --bg-secondary: #1a1a2e;
+    --bg-glass: rgba(255, 255, 255, 0.05);
+    --bg-glass-hover: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.4);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --neon-teal: #00f2ea;
+    --neon-pink: #ff0050;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --card-bg: rgba(255, 255, 255, 0.03);
+}
+
+/* Light Mode */
+/* Light Mode - Premium Professional */
+body.light-mode {
+    --bg-primary: #cbd5e1;
+    /* Deep Slate Blue-Gray (Darker than #f0f2f5) */
+    --bg-secondary: #ffffff;
+    /* Pure white for cards */
+    --bg-glass: rgba(255, 255, 255, 0.7);
+    /* Frosted glass effect */
+    --bg-glass-hover: rgba(255, 255, 255, 0.9);
+    --text-primary: #1e293b;
+    /* Slate 800 - Professional dark */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --border-color: rgba(0, 0, 0, 0.08);
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --input-bg: #f8fafc;
+    --card-bg: #ffffff;
+
+    /* Adjusted Accents for Light Backgrounds */
+    --neon-teal: #0d9488;
+    /* Teal 600 - Readable on white */
+    --neon-pink: #db2777;
+    /* Pink 600 */
+}
+
+body.light-mode .yemeni-theme,
+body.light-mode #app-container,
+body.light-mode .content-wrapper {
+    background: var(--bg-primary) !important;
+}
+
+/* Override Welcome Page Image for Professional Look */
+body.light-mode {
+    background-image: none !important;
+    background-color: var(--bg-primary) !important;
+}
+
+body.light-mode .control-panel,
+body.light-mode #control-panel,
+body.light-mode .control-section,
+body.light-mode .control-card {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* Modern shadow */
+    border: 1px solid var(--border-color);
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode label,
+body.light-mode p,
+body.light-mode span {
+    color: var(--text-primary) !important;
+}
+
+body.light-mode input[type="text"],
+body.light-mode input[type="range"],
+body.light-mode select,
+body.light-mode textarea {
+    background: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid #cbd5e1 !important;
+    /* Slate 300 */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode input:focus,
+body.light-mode select:focus,
+body.light-mode textarea:focus {
+    border-color: var(--neon-teal) !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1) !important;
+    /* Focus ring */
+}
+
+body.light-mode .control-group,
+body.light-mode .group-header {
+    background: var(--bg-glass) !important;
+}
+
+body.light-mode a {
+    color: var(--neon-teal) !important;
+}
+
+/* ===== FLOATING CONTROLS CONTAINER ===== */
+.floating-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    left: auto;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ===== SHARED TOGGLE BUTTON STYLES ===== */
+.ui-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    color: var(--text-primary);
+}
+
+.ui-toggle-btn:hover {
+    transform: scale(1.1);
+    background: var(--bg-glass-hover);
+    border-color: var(--neon-teal);
+}
+
+body.light-mode .ui-toggle-btn {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #475569;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .ui-toggle-btn:hover {
+    background: #f8fafc;
+    border-color: var(--neon-teal);
+    color: var(--neon-teal);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific Toggles */
+.theme-toggle-btn::before {
+    content: '🌙';
+}
+
+body.light-mode .theme-toggle-btn::before {
+    content: '☀️';
+}
+
+.lang-toggle-btn {
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+}
+
+/* ===== CAMERA SWITCH BUTTON ===== */
+.camera-switch-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    /* Higher z-index to be above video */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.camera-switch-btn:hover {
+    background: var(--neon-teal);
+    border-color: var(--neon-teal);
+    transform: rotate(180deg);
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+    .floating-controls {
+        top: 15px;
+        right: 15px;
+        left: auto;
+        gap: 8px;
+    }
+
+    .ui-toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+}

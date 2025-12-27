@@ -370,7 +370,7 @@ holistic = new Holistic({
 });
 
 holistic.setOptions({
-    modelComplexity: 1,
+    modelComplexity: 0, // Lite mode for speed
     smoothLandmarks: true,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5

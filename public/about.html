@@ -7,6 +7,7 @@
     <title>من نحن | لغة الإشارة اليمنية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,9 +26,9 @@
 
         body {
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
-            color: white;
+            color: var(--text-primary);
             overflow-x: hidden;
         }
 
@@ -315,17 +316,19 @@
     <div class="bg-animation"></div>
 
     <div class="header">
-        <a href="welcome.html" class="back-btn">→ العودة للرئيسية</a>
+        <a href="welcome.html" class="back-btn" data-ar="→ العودة للرئيسية" data-en="→ Back to Home">→ العودة
+            للرئيسية</a>
         <div class="logo">🤟</div>
-        <h1>من نحن</h1>
-        <p class="subtitle">About Us</p>
+        <h1 data-ar="من نحن" data-en="About Us">من نحن</h1>
+        <p class="subtitle" data-ar=" نبتكر للمستقبل, نتحدث بلغه الجميع" data-en="Project Overview">عن المشروع</p>
     </div>
 
     <div class="container">
         <!-- About Card -->
         <div class="about-card">
-            <h2>🎓 مشروع تخرج</h2>
-            <p>
+            <h2 data-ar="🎓 مشروع تخرج" data-en="🎓 Graduation Project">🎓 مشروع تخرج</h2>
+            <p data-ar="نحن مجموعة من طلاب كلية الهندسة - قسم الحاسبات والتحكم الآلي. قمنا بتطوير هذا المشروع لخدمة مجتمع الصم والبكم في اليمن وتسهيل التواصل بين الأشخاص السامعين وذوي الإعاقة السمعية."
+                data-en="We are a group of students from the Faculty of Engineering - Computers & Control Dept. We developed this project to serve the Deaf & Mute community in Yemen and bridge the communication gap.">
                 نحن مجموعة من طلاب كلية الهندسة - قسم الحاسبات والتحكم الآلي
                 <br>
                 قمنا بتطوير هذا المشروع لخدمة مجتمع الصم والبكم في اليمن
@@ -335,62 +338,74 @@
 
             <div class="university-badge">
                 <span>🏛️</span>
-                <span>جامعة إب - كلية الهندسة</span>
+                <span data-ar="جامعة إب - كلية الهندسة" data-en="Ibb University - Faculty of Engineering">جامعة إب -
+                    كلية الهندسة</span>
             </div>
         </div>
 
         <!-- Team Section -->
         <div class="team-section">
-            <h2>👨‍💻 فريق العمل</h2>
-            <div class="team-grid">
-                <div class="team-member">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>م. عبدالرحمن السريحي</h3>
-                    <p class="title">مطور</p>
-                </div>
-                <div class="team-member">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>م. حمزة الشامي</h3>
-                    <p class="title">مطور</p>
-                </div>
-                <div class="team-member">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>م. أحمد ثامر</h3>
-                    <p class="title">مطور</p>
-                </div>
-                <div class="team-member">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>م. إبراهيم فايز</h3>
-                    <p class="title">مطور</p>
-                </div>
-                <div class="team-member">
-                    <div class="avatar">👨‍💻</div>
-                    <h3>م. إلياس امين الهتار</h3>
-                    <p class="title">مطور</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Supervisors -->
-        <div class="supervisors">
-            <h2>👨‍🏫 تحت إشراف</h2>
-            <div class="supervisor-list">
-                <div class="supervisor">
-                    <h3>أ.د. فرحان نشوان</h3>
-                    <p class="role">المشرف الأول</p>
-                </div>
-                <div class="supervisor">
-                    <h3>د. إبراهيم حسان</h3>
-                    <p class="role">المشرف المشارك</p>
+            <!-- Team Section -->
+            <div class="team-section">
+                <h2 data-ar="👨‍💻 فريق العمل" data-en="👨‍💻 The Team">👨‍💻 فريق العمل</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>م. عبدالرحمن السريحي</h3>
+                        <p class="title">مطور</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>م. حمزة الشامي</h3>
+                        <p class="title">مطور</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>م. أحمد ثامر</h3>
+                        <p class="title">مطور</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>م. إبراهيم فايز</h3>
+                        <p class="title">مطور</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>م. إلياس امين الهتار</h3>
+                        <p class="title">مطور</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="footer">
-        <p> بكل فخر صُنع في اليمن</p>
-        <p style="margin-top: 0.5rem;">2026 © جميع الحقوق محفوظة</p>
-    </div>
+            <!-- Supervisors -->
+            <div class="supervisors">
+                <!-- Supervisors -->
+                <div class="supervisors">
+                    <h2 data-ar="👨‍🏫 تحت إشراف" data-en="👨‍🏫 Supervision">👨‍🏫 تحت إشراف</h2>
+                    <div class="supervisor-list">
+                        <div class="supervisor">
+                            <h3>أ.د. فرحان نشوان</h3>
+                            <p class="role" data-ar="المشرف الأول" data-en="Primary Supervisor">المشرف الأول</p>
+                        </div>
+                        <div class="supervisor">
+                            <h3>د. إبراهيم حسان</h3>
+                            <p class="role" data-ar="المشرف المشارك" data-en="Co-Supervisor">المشرف المشارك</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footer">
+                    <p data-ar="بكل فخر صُنع في اليمن" data-en="Proudly Made in Yemen">بكل فخر صُنع في اليمن</p>
+                    <p style="margin-top: 0.5rem;" data-ar="2026 © جميع الحقوق محفوظة"
+                        data-en="2026 © All Rights Reserved">2026 © جميع الحقوق محفوظة</p>
+                </div>
+            </div>
+</body>
+
+<!-- Global UI Manager (Theme, Lang) -->
+<script src="src/global-ui.js"></script>
 </body>
 
 </html>

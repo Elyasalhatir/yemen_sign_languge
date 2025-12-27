@@ -251,14 +251,13 @@ async function predict(features) {
             }
         }
 
-        // Get word from word_map (now returns actual word, not number!)
-        const word = wordMapping[maxIdx];
+        const word = wordMapping[maxIdx]; // e.g. "FAMILY"
         handlePrediction(word, maxProb);
     });
 }
 
 function handlePrediction(word, confidence) {
-    // Get Arabic translation from our fixed WORD_DB
+    // Get Arabic translation
     const arabic = WORD_DB[word] ? WORD_DB[word].arabic : word;
 
     wordEnEl.innerText = word;
@@ -267,6 +266,10 @@ function handlePrediction(word, confidence) {
     const confPercent = Math.round(confidence * 100);
     confFillEl.style.width = `${confPercent}%`;
     confTextEl.innerText = `${confPercent}% Confidence`;
+
+    // Determine Language from Global UI
+    const currentLang = window.globalUI ? window.globalUI.currentLang : 'ar';
+    const textToUse = currentLang === 'en' ? word : arabic;
 
     // Smoothing with better threshold
     if (confidence > 0.5) {
@@ -281,9 +284,9 @@ function handlePrediction(word, confidence) {
         const count = predictionBuffer.filter(w => w === word).length;
         if (count >= 3 && word !== lastWord) {
             lastWord = word;
-            sentence.push(arabic);
+            sentence.push(textToUse);
             updateSentenceBox();
-            speak(arabic, 'ar');
+            speak(textToUse);
             cooldown = 10;
             predictionBuffer = [];
         }
@@ -299,12 +302,14 @@ function updateSentenceBox() {
 function clearSentence() {
     sentence = [];
     lastWord = "";
-    sentenceBox.innerText = "Waiting for signs...";
+    // Update placeholder based on language if possible, but static text for now
+    const currentLang = window.globalUI ? window.globalUI.currentLang : 'ar';
+    sentenceBox.innerText = currentLang === 'en' ? "Waiting for signs..." : "في انتظار الإشارات...";
 }
 
 function speakSentence() {
     const text = sentence.join(' ');
-    if (text) speak(text, 'ar');
+    if (text) speak(text);
 }
 
 function formSentenceAI() {
@@ -315,10 +320,11 @@ function formSentenceAI() {
     }
 }
 
-function speak(text, lang = 'ar') {
+function speak(text) {
     if ('speechSynthesis' in window) {
+        const currentLang = window.globalUI ? window.globalUI.currentLang : 'ar';
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang === 'ar' ? 'ar-SA' : 'en-US';
+        utterance.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
         speechSynthesis.speak(utterance);
     }
 }
@@ -330,7 +336,7 @@ const holistic = new Holistic({
 });
 
 holistic.setOptions({
-    modelComplexity: 1,
+    modelComplexity: 0, // Lite for speed
     smoothLandmarks: true,
     enableSegmentation: false,
     smoothSegmentation: false,
@@ -402,8 +408,8 @@ function startCamera() {
         onFrame: async () => {
             await holistic.send({ image: videoElement });
         },
-        width: 1280,
-        height: 720,
+        width: 640,
+        height: 480,
         facingMode: currentFacingMode
     });
     camera.start();

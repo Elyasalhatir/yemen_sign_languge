@@ -102,10 +102,12 @@ export class TranslatorManager {
         let lang = 'ar-SA'; // Default
         let selectedLang = 'ar'; // Track which language was selected
 
-        if (this.langRadios) {
+        if (window.globalUI && window.globalUI.currentLang) {
+            lang = window.globalUI.currentLang === 'ar' ? 'ar-SA' : 'en-US';
+            console.log("Using Global Language:", lang);
+        } else if (this.langRadios) {
             for (const radio of this.langRadios) {
                 if (radio.checked) {
-                    selectedLang = radio.value;
                     lang = radio.value === 'ar' ? 'ar-SA' : 'en-US';
                     break;
                 }
@@ -154,24 +156,40 @@ export class TranslatorManager {
             const animations = [];
             const foundWords = [];
 
-            // Look up each word in the dictionary
+            // Look up each word in the dictionary (supports Arabic OR English input)
             for (const word of words) {
-                // Try exact match first
+                let animFile = null;
+                const wordLower = word.toLowerCase();
+
+                // 1. Try Arabic key exact match
                 if (this.dictionary[word]) {
-                    animations.push(this.dictionary[word].toLowerCase());
+                    animFile = this.dictionary[word].toLowerCase();
                     foundWords.push(word);
-                } else {
-                    // Try case-insensitive search
-                    const found = Object.keys(this.dictionary).find(
-                        key => key.toLowerCase() === word.toLowerCase()
+                }
+                // 2. Try Arabic key case-insensitive
+                else {
+                    const arabicMatch = Object.keys(this.dictionary).find(
+                        key => key.toLowerCase() === wordLower || key.trim() === word.trim()
                     );
-                    if (found) {
-                        animations.push(this.dictionary[found].toLowerCase());
-                        foundWords.push(found);
-                    } else {
-                        console.log(`Word not in dictionary: ${word}`);
+                    if (arabicMatch) {
+                        animFile = this.dictionary[arabicMatch].toLowerCase();
+                        foundWords.push(arabicMatch);
+                    }
+                    // 3. Try English value (reverse lookup)
+                    else {
+                        const englishMatch = Object.entries(this.dictionary).find(
+                            ([ar, en]) => en.toLowerCase() === wordLower
+                        );
+                        if (englishMatch) {
+                            animFile = englishMatch[1].toLowerCase();
+                            foundWords.push(englishMatch[0]); // Show Arabic in status
+                        } else {
+                            console.log(`Word not in dictionary: ${word}`);
+                        }
                     }
                 }
+
+                if (animFile) animations.push(animFile);
             }
 
             if (animations.length === 0) {
@@ -245,13 +263,15 @@ export class TranslatorManager {
     animateFrames(frames) {
         return new Promise((resolve) => {
             let startTime = null;
-            let previousFrame = null;
+
+            // Detect frame format: Quaternion arrays (camera) vs Euler objects (manual)
+            const isManualFormat = frames[0]?.bones && !frames[0].bones.poseQuatArr && typeof frames[0].bones === 'object';
 
             const animate = (timestamp) => {
                 if (!startTime) startTime = timestamp;
                 const progress = timestamp - startTime;
 
-                // Find current and next frame for interpolation
+                // Find current frame based on timestamp
                 let currentFrameIndex = 0;
                 for (let i = 0; i < frames.length; i++) {
                     if (frames[i].time <= progress) {
@@ -264,31 +284,49 @@ export class TranslatorManager {
                 // Check if animation is complete
                 if (currentFrameIndex >= frames.length - 1) {
                     // Apply last frame
-                    this.avatarController.update(frames[frames.length - 1].bones);
+                    const lastBones = frames[frames.length - 1].bones;
+                    if (isManualFormat) {
+                        this._applyManualBones(lastBones);
+                    } else {
+                        this.avatarController.update(lastBones);
+                    }
                     resolve();
                     return;
                 }
 
                 const currentFrame = frames[currentFrameIndex];
-                const nextFrame = frames[currentFrameIndex + 1];
 
-                // Calculate interpolation factor (0 to 1)
-                const frameDuration = nextFrame.time - currentFrame.time;
-                const frameProgress = progress - currentFrame.time;
-                const t = Math.min(frameDuration > 0 ? frameProgress / frameDuration : 1, 1);
-
-                // Smooth interpolation using ease-out function
-                const smoothT = 1 - Math.pow(1 - t, 3); // Cubic ease-out
-
-                // Interpolate between frames (simple lerp for now, can be enhanced)
-                // For now, we'll use the avatar controller's built-in SLERP
-                // Just apply the current frame and let the SLERP settings handle smoothness
-                this.avatarController.update(currentFrame.bones);
+                // Apply the frame
+                if (isManualFormat) {
+                    this._applyManualBones(currentFrame.bones);
+                } else {
+                    this.avatarController.update(currentFrame.bones);
+                }
 
                 requestAnimationFrame(animate);
             };
 
             requestAnimationFrame(animate);
+        });
+    }
+
+    /**
+     * Apply Euler bone rotations from manual studio recordings.
+     * This directly manipulates the avatar's bone rotations using Three.js.
+     */
+    _applyManualBones(bones) {
+        if (!this.avatarController || !this.avatarController.boneManager) return;
+
+        const boneManager = this.avatarController.boneManager;
+
+        Object.keys(bones).forEach(boneName => {
+            const rot = bones[boneName];
+            const bone = boneManager.getBone(boneName);
+            if (bone) {
+                if (rot.x !== undefined) bone.rotation.x = rot.x;
+                if (rot.y !== undefined) bone.rotation.y = rot.y;
+                if (rot.z !== undefined) bone.rotation.z = rot.z;
+            }
         });
     }
 }

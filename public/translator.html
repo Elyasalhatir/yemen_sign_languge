@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لغة الإشارة اليمنية - المترجم | Yemeni Sign Language Translator</title>
     <link rel="stylesheet" href="translator-style.css">
+    <link rel="stylesheet" href="theme.css">
 
     <!-- HTTPS Redirect for Mobile Camera Access -->
     <script>
@@ -28,15 +29,54 @@
     <div id="translator-container">
         <!-- Header -->
         <header>
-            <h1>🤟 Sign Language Translator مترجم لغة الإشارة</h1>
-            <p class="subtitle">Translate text to sign language | ترجمة النص إلى لغة الإشارة</p>
-            <a href="welcome.html" class="back-link">← Back to Home | العودة للرئيسية</a>
+            <h1 data-ar="مترجم لغة الإشارة" data-en="Sign Language Translator">🤟 Sign Language Translator مترجم لغة
+                الإشارة</h1>
+            <p class="subtitle" data-ar="ترجمة النص إلى لغة الإشارة" data-en="Translate text to sign language">Translate
+                text to sign language | ترجمة النص إلى لغة الإشارة</p>
+            <a href="welcome.html" class="back-link" data-ar="← العودة للرئيسية" data-en="← Back to Home">← Back to Home
+                | العودة للرئيسية</a>
         </header>
 
         <!-- Main Content -->
         <div class="content-wrapper">
             <!-- Left: Avatar Display -->
             <div class="avatar-section">
+                <!-- Expanded Compact Controls Bar -->
+                <div class="compact-controls"
+                    style="display: flex; gap: 15px; margin-bottom: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(0,242,234,0.1), rgba(255,0,80,0.05)); border-radius: 16px; align-items: center; flex-wrap: wrap; border: 1px solid rgba(255,255,255,0.1);">
+                    <select id="avatar-selector"
+                        style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: var(--text-primary); font-size: 0.9rem; cursor: pointer;">
+                        <option value="" disabled selected data-ar="اختر الشخصية..." data-en="Select Avatar...">🧛 اختر
+                            الشخصية...</option>
+                    </select>
+                    <div
+                        style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px;">
+                        <span style="font-size: 0.85rem; color: #00f2ea;" data-ar="الحجم" data-en="Scale">📐
+                            الحجم</span>
+                        <input type="range" id="global-scale" min="0.5" max="3" step="0.1" value="1.7"
+                            style="width: 80px; accent-color: #00f2ea;" title="Scale">
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px;">
+                        <span style="font-size: 0.85rem; color: #00f2ea;" data-ar="الارتفاع" data-en="Height">↕
+                            الارتفاع</span>
+                        <input type="range" id="global-pos-y" min="-3" max="1" step="0.1" value="-1"
+                            style="width: 80px; accent-color: #00f2ea;" title="Height">
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px;">
+                        <span style="font-size: 0.85rem; color: #ff0050;" data-ar="العمق" data-en="Depth">↔ العمق</span>
+                        <input type="range" id="global-pos-z" min="-5" max="2" step="0.1" value="-1"
+                            style="width: 80px; accent-color: #ff0050;" title="Depth">
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px;">
+                        <span style="font-size: 0.85rem; color: #00f2ea;" data-ar="الدوران" data-en="Rotation">🔄
+                            الدوران</span>
+                        <input type="range" id="global-rot-y" min="-180" max="180" step="1" value="0"
+                            style="width: 80px; accent-color: #00f2ea;" title="Rotation">
+                    </div>
+                </div>
                 <div class="avatar-frame">
                     <a-scene embedded vr-mode-ui="enabled: false" style="border-radius: 20px;">
                         <a-asset>
@@ -53,10 +93,23 @@
                         <a-entity light="type: point; color: #ff0050; intensity: 0.5; distance: 10"
                             position="-2 2 2"></a-entity>
 
-                        <a-sky color="#1a1a2e"></a-sky>
+                        <a-sky id="translator-sky" color="#1a1a2e"></a-sky>
+
+                        <script>
+                            window.addEventListener('themeChanged', (e) => {
+                                const sky = document.getElementById('translator-sky');
+                                if (sky) sky.setAttribute('color', e.detail.theme === 'light' ? '#f0f2f5' : '#1a1a2e');
+                            });
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const theme = localStorage.getItem('theme') || 'dark';
+                                const sky = document.getElementById('translator-sky');
+                                if (sky && theme === 'light') sky.setAttribute('color', '#f0f2f5');
+                            });
+                        </script>
 
                         <!-- Avatar -->
-                        <a-gltf-model position="0 -1 -1" src="male.glb" id="male" scale="1.7 1.7 1.7"></a-gltf-model>
+                        <a-gltf-model position="0 -1 -1" src="avatars/male.glb" id="male"
+                            scale="1.7 1.7 1.7"></a-gltf-model>
 
                         <!-- Camera -->
                         <a-entity id="camera" camera look-controls="enabled: false" wasd-controls="enabled: false"
@@ -66,30 +119,21 @@
                 </div>
                 <div class="status-indicator">
                     <span class="status-dot"></span>
-                    <span id="playback-status">Ready | جاهز</span>
+                    <span id="playback-status" data-ar="جاهز" data-en="Ready">Ready | جاهز</span>
                 </div>
             </div>
 
             <!-- Right: Control Panel -->
             <div class="control-section">
                 <div class="control-card">
-                    <h2>🔤 Translation Input | إدخال الترجمة</h2>
+                    <h2 data-ar="إدخال الترجمة" data-en="Translation Input">🔤 Translation Input | إدخال الترجمة</h2>
 
-                    <!-- Language Selection -->
-                    <div class="lang-selector">
-                        <label class="lang-option">
-                            <input type="radio" name="lang-choice" value="ar" checked>
-                            <span>🇸🇦 العربية</span>
-                        </label>
-                        <label class="lang-option">
-                            <input type="radio" name="lang-choice" value="en">
-                            <span>🇺🇸 English</span>
-                        </label>
-                    </div>
+                    <!-- NOTE: Removed local language selector (replaced by global UI) -->
 
                     <!-- Input Methods -->
                     <div class="input-group">
-                        <input type="text" id="translator-input"
+                        <input type="text" id="translator-input" data-ar="اكتب جملتك هنا..."
+                            data-en="Type your sentence here..."
                             placeholder="اكتب جملتك هنا... | Type your sentence here...">
                         <button id="mic-btn" class="mic-button" title="Voice Input | إدخال صوتي">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -104,25 +148,31 @@
                     <!-- Translate Button -->
                     <button id="play-btn" class="translate-btn">
                         <span class="btn-icon">▶</span>
-                        <span>Translate & Play | ترجم وشغل</span>
+                        <span data-ar="ترجم وشغل" data-en="Translate & Play">Translate & Play | ترجم وشغل</span>
                     </button>
 
-                    <p id="translator-status" class="status-message">Waiting for input... | في انتظار الإدخال...</p>
+                    <p id="translator-status" class="status-message" data-ar="في انتظار الإدخال..."
+                        data-en="Waiting for input...">Waiting for input... | في انتظار الإدخال...</p>
                 </div>
 
                 <!-- Dictionary Display -->
                 <div class="control-card dictionary-card">
-                    <h2>📚 Available Words | الكلمات المتاحة</h2>
+                    <h2 data-ar="الكلمات المتاحة" data-en="Available Words">📚 Available Words | الكلمات المتاحة</h2>
                     <div class="dictionary-search">
-                        <input type="text" id="dict-search" placeholder="🔍 Search... | بحث...">
+                        <input type="text" id="dict-search" data-ar="بحث..." data-en="Search..."
+                            placeholder="🔍 Search... | بحث...">
                     </div>
                     <div id="dictionary-list" class="dictionary-list">
-                        <p class="loading-text">Loading dictionary... | تحميل القاموس...</p>
+                        <p class="loading-text" data-ar="تحميل القاموس..." data-en="Loading dictionary...">Loading
+                            dictionary... | تحميل القاموس...</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Global UI Manager (Theme, Lang, Camera) -->
+    <script src="src/global-ui.js"></script>
 
     <script type="module">
         import MediapipeAvatarManager from './src/MediapipeAvatarManager.js'
@@ -146,56 +196,199 @@
 
         console.log("Translator mode initialized with ultra-smooth settings");
 
-        // Dictionary Display
+        // Load categories and dictionary for categorized display
+        let globalDictionary = {};
+        let categories = {};
+
         async function loadAndDisplayDictionary() {
             try {
-                const response = await fetch('/dictionary.json');
-                if (response.ok) {
-                    const dictionary = await response.json();
-                    displayDictionary(dictionary);
-                }
+                const [dictRes, catRes] = await Promise.all([
+                    fetch('/dictionary.json'),
+                    fetch('/categories.json')
+                ]);
+                if (dictRes.ok) globalDictionary = await dictRes.json();
+                if (catRes.ok) categories = await catRes.json();
+                displayCategorizedDictionary();
             } catch (e) {
                 console.error("Failed to load dictionary:", e);
                 document.getElementById('dictionary-list').innerHTML = '<p class="error-text">Failed to load | فشل التحميل</p>';
             }
         }
 
-        function displayDictionary(dictionary) {
+        function displayCategorizedDictionary() {
             const listEl = document.getElementById('dictionary-list');
             const searchEl = document.getElementById('dict-search');
 
-            if (Object.keys(dictionary).length === 0) {
+            if (Object.keys(globalDictionary).length === 0) {
                 listEl.innerHTML = '<p class="empty-text">No words yet | لا توجد كلمات بعد</p>';
                 return;
             }
 
-            function renderDictionary(filter = '') {
-                const filtered = Object.entries(dictionary).filter(([ar, en]) =>
-                    ar.includes(filter) || en.toLowerCase().includes(filter.toLowerCase())
-                );
+            function renderCategories(filter = '') {
+                // If filter is active, only show searching text if using global UI needs logic update in render
+                // For now, render direct HTML. 
+                // Since this content is dynamic, the global-ui.js won't catch it automatically unless we re-run applyLanguage().
+                // However, the categories themselves (name_ar/name_en) are bilingual data.
 
-                if (filtered.length === 0) {
-                    listEl.innerHTML = '<p class="empty-text">No results | لا توجد نتائج</p>';
-                    return;
+                // We'll trust the user accepts dynamic content might need a refresh or we can attach data-ar/en classes.
+                // Improving render to use data attributes for static parts:
+
+                let html = '';
+
+                // Render each category
+                for (const [catKey, cat] of Object.entries(categories)) {
+                    const words = cat.words.filter(w =>
+                        globalDictionary[w] && (w.includes(filter) || (globalDictionary[w] || '').toLowerCase().includes(filter.toLowerCase()))
+                    );
+                    if (words.length === 0) continue;
+
+                    html += `
+                        <div class="category-block" style="margin-bottom: 15px;">
+                            <div class="category-header" onclick="this.nextElementSibling.classList.toggle('hidden')" 
+                                 style="cursor: pointer; padding: 10px; background: rgba(0,242,234,0.1); border-radius: 10px; display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.3rem;">${cat.icon}</span>
+                                <span style="font-weight: 600; color: var(--text-primary);" data-ar="${cat.name_ar}" data-en="${cat.name_en}">${cat.name_ar}</span>
+                                <span style="color: var(--text-secondary); font-size: 0.85rem;">(${words.length})</span>
+                            </div>
+                            <div class="category-words" style="padding: 10px 0;">
+                                ${words.map(word => `
+                                    <div class="dict-item" onclick="playWord('${word}')" style="cursor: pointer; padding: 8px 12px; margin: 4px 0; background: var(--card-bg); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;">
+                                        <span class="dict-ar" style="font-weight: 500; color: var(--text-primary);">${word}</span>
+                                        <span class="dict-en" style="color: var(--text-secondary); font-size: 0.85rem;">${globalDictionary[word]}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
                 }
 
-                listEl.innerHTML = filtered.map(([arabic, english]) => `
-                    <div class="dict-item">
-                        <span class="dict-ar">${arabic}</span>
-                        <span class="dict-arrow">→</span>
-                        <span class="dict-en">${english}</span>
-                    </div>
-                `).join('');
+                // ... Uncategorized section similar logic ...
+
+                listEl.innerHTML = html || '<p class="empty-text">No results | لا توجد نتائج</p>';
+
+                // Re-apply language to newly created elements
+                if (window.globalUI && window.globalUI.applyLanguage) {
+                    window.globalUI.applyLanguage(window.globalUI.currentLang);
+                }
             }
 
-            renderDictionary();
+            renderCategories();
+            searchEl.addEventListener('input', (e) => renderCategories(e.target.value));
+        }
 
-            searchEl.addEventListener('input', (e) => {
-                renderDictionary(e.target.value);
+        // Click-to-play function
+        window.playWord = async function (word) {
+            const statusEl = document.getElementById('playback-status');
+            statusEl.innerText = `▶ ${word}...`;
+
+            const animFile = globalDictionary[word]?.toLowerCase();
+            if (!animFile) {
+                statusEl.innerText = 'لا توجد حركة | No animation';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/animations/${animFile}.json`);
+                if (!res.ok) throw new Error('Not found');
+                const frames = await res.json();
+                await translatorManager.animateFrames(frames);
+                await translatorManager.returnToRestPose();
+                statusEl.innerText = 'Ready | جاهز';
+            } catch (e) {
+                console.warn('Animation not found:', animFile);
+                statusEl.innerText = 'الحركة غير موجودة | Animation not found';
+            }
+        };
+
+        loadAndDisplayDictionary();
+
+        // Avatar Selector
+        async function loadAvatars() {
+            try {
+                const res = await fetch('/list-avatars');
+                const avatars = await res.json();
+                const sel = document.getElementById('avatar-selector');
+                avatars.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = opt.text = a;
+                    if (a === 'male.glb') opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            } catch (e) { console.error('Failed to load avatars', e); }
+        }
+        loadAvatars();
+
+        document.getElementById('avatar-selector').addEventListener('change', (e) => {
+            document.getElementById('male').setAttribute('src', 'avatars/' + e.target.value);
+        });
+
+        // Global Transforms
+        const avatarEntity = document.getElementById('male');
+        const controls = [
+            { id: 'global-scale', type: 'scale' },
+            { id: 'global-pos-y', type: 'pos', axis: 'y' },
+            { id: 'global-pos-z', type: 'pos', axis: 'z' },
+            { id: 'global-rot-y', type: 'rot', axis: 'y' }
+        ];
+
+        function saveGlobal(type, axis, value) {
+            const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+            const floatVal = parseFloat(value);
+            if (!settings[type]) settings[type] = {};
+            if (type === 'scale') settings[type] = floatVal;
+            else settings[type][axis] = floatVal;
+            localStorage.setItem('avatarSettings', JSON.stringify(settings));
+        }
+
+        function applyGlobalSettings() {
+            const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+            if (!avatarEntity || !settings) return;
+
+            if (settings.scale) avatarEntity.setAttribute('scale', `${settings.scale} ${settings.scale} ${settings.scale}`);
+            if (settings.pos) {
+                const p = avatarEntity.getAttribute('position');
+                if (settings.pos.x !== undefined) p.x = settings.pos.x;
+                if (settings.pos.y !== undefined) p.y = settings.pos.y;
+                if (settings.pos.z !== undefined) p.z = settings.pos.z;
+                avatarEntity.setAttribute('position', p);
+            }
+            if (settings.rot) {
+                const r = avatarEntity.getAttribute('rotation');
+                if (settings.rot.y !== undefined) r.y = settings.rot.y;
+                avatarEntity.setAttribute('rotation', r);
+            }
+
+            // Sync UI
+            controls.forEach(ctrl => {
+                const el = document.getElementById(ctrl.id);
+                if (ctrl.type === 'scale' && settings.scale) el.value = settings.scale;
+                else if (ctrl.type === 'pos' && settings.pos && settings.pos[ctrl.axis] !== undefined) el.value = settings.pos[ctrl.axis];
+                else if (ctrl.type === 'rot' && settings.rot && settings.rot[ctrl.axis] !== undefined) el.value = settings.rot[ctrl.axis];
             });
         }
 
-        loadAndDisplayDictionary();
+        controls.forEach(ctrl => {
+            document.getElementById(ctrl.id).addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (ctrl.type === 'scale') {
+                    avatarEntity.setAttribute('scale', `${val} ${val} ${val}`);
+                } else if (ctrl.type === 'pos') {
+                    const pos = avatarEntity.getAttribute('position');
+                    pos[ctrl.axis] = val;
+                    avatarEntity.setAttribute('position', pos);
+                } else if (ctrl.type === 'rot') {
+                    const rot = avatarEntity.getAttribute('rotation');
+                    rot[ctrl.axis] = val;
+                    avatarEntity.setAttribute('rotation', rot);
+                }
+                saveGlobal(ctrl.type, ctrl.axis, val);
+            });
+        });
+
+        // Load on start
+        avatarEntity.addEventListener('model-loaded', () => {
+            applyGlobalSettings();
+        });
 
     </script>
 </body>

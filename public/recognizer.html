@@ -22,6 +22,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="recognizer-style.css">
+    <link rel="stylesheet" href="theme.css">
 
     <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
@@ -38,32 +39,30 @@
 <body>
     <header>
         <div style="position: absolute; top: 20px; left: 20px; z-index: 1000; display: flex; gap: 10px;">
-            <a href="welcome.html" class="back-link" style="position: relative; top: 0; left: 0;">← Back | عودة</a>
-
-            <button id="camera-switch-btn" onclick="switchCamera()"
-                style="background: rgba(0, 242, 234, 0.2); border: 1px solid #00f2ea; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 1.2rem;">
-                📷
-            </button>
+            <a href="welcome.html" class="back-link" style="position: relative; top: 0; left: 0;" data-ar="← عودة"
+                data-en="← Back">← Back | عودة</a>
         </div>
-        <h1>Sign Recognizer <span class="ar-title">مترجم الإشارة</span></h1>
-        <p class="subtitle">Speak with your hands | تحدث بيديك</p>
+        <h1 data-ar="مترجم الإشارة" data-en="Sign Recognizer">Sign Recognizer <span class="ar-title">مترجم
+                الإشارة</span></h1>
+        <p class="subtitle" data-ar="تحدث بيديك" data-en="Speak with your hands">Speak with your hands | تحدث بيديك</p>
     </header>
 
     <div class="content-wrapper">
         <!-- Video Section -->
         <div class="video-section">
             <div class="video-frame">
+                <!-- ID is crucial for global-ui camera switch -->
                 <video id="input_video" style="display: none;"></video>
                 <canvas id="output_canvas"></canvas>
                 <div class="loading-overlay" id="loading">
                     <div class="spinner"></div>
-                    <p>Loading AI Model...</p>
+                    <p data-ar="تحميل النموذج..." data-en="Loading AI Model...">Loading AI Model...</p>
                 </div>
             </div>
 
             <div class="status-indicator">
                 <div class="status-dot" id="status-dot"></div>
-                <span id="status-text">Loading...</span>
+                <span id="status-text" data-ar="جاري التحميل..." data-en="Loading...">Loading...</span>
             </div>
         </div>
 
@@ -72,7 +71,7 @@
 
             <!-- Recognition Card -->
             <div class="result-card">
-                <h2>Recognized Word | الكلمة</h2>
+                <h2 data-ar="الكلمة" data-en="Recognized Word">Recognized Word | الكلمة</h2>
                 <div class="word-display">
                     <div class="word-en" id="word-en">Waiting...</div>
                     <div class="word-ar" id="word-ar">...</div>
@@ -85,18 +84,20 @@
 
             <!-- Sentence History -->
             <div class="history-card">
-                <h3>Sentence | الجملة</h3>
-                <div class="sentence-box" id="sentence-box">
+                <h3 data-ar="الجملة" data-en="Sentence">Sentence | الجملة</h3>
+                <div class="sentence-box" id="sentence-box" data-ar="في انتظار الإشارات..."
+                    data-en="Waiting for signs...">
                     Waiting for signs...
                 </div>
                 <div class="controls">
-                    <button class="btn-action btn-speak" onclick="speakSentence()">
+                    <button class="btn-action btn-speak" onclick="speakSentence()" data-ar="🔊 نطق" data-en="🔊 Speak">
                         🔊 Speak | نطق
                     </button>
-                    <button class="btn-action btn-ai" onclick="formSentenceAI()">
+                    <button class="btn-action btn-ai" onclick="formSentenceAI()" data-ar="✨ جملة ذكية"
+                        data-en="✨ AI Sentence">
                         ✨ AI Sentence
                     </button>
-                    <button class="btn-action btn-clear" onclick="clearSentence()">
+                    <button class="btn-action btn-clear" onclick="clearSentence()" data-ar="🗑 مسح" data-en="🗑 Clear">
                         🗑 Clear | مسح
                     </button>
                 </div>
@@ -104,14 +105,45 @@
 
             <!-- Instructions -->
             <div class="info-card">
-                <p>💡 <strong>Tip:</strong> Ensure good lighting and keep your hands visible within the frame.</p>
+                <p data-ar="💡 نصيحة: تأكد من الإضاءة الجيدة ووضوح اليدين." data-en="💡 Tip: Ensure good lighting.">💡
+                    <strong>Tip:</strong> Ensure good lighting and keep your hands visible within the frame.</p>
             </div>
 
         </div>
     </div>
 
+    <!-- Global UI Manager (Theme, Lang, Camera) -->
+    <script src="src/global-ui.js"></script>
+
     <!-- Logic Script -->
     <script src="src/RecognizerManager.js"></script>
+    <script>
+        // Global Transform Persistence (V5)
+        document.querySelectorAll('.global-control').forEach(s => {
+            s.addEventListener('input', (e) => {
+                const type = s.dataset.type;
+                const axis = s.dataset.axis;
+                const val = parseFloat(e.target.value);
+                const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+                if (!settings[type]) settings[type] = {};
+                if (type === 'scale') settings[type] = val;
+                else settings[type][axis] = val;
+                localStorage.setItem('avatarSettings', JSON.stringify(settings));
+            });
+        });
+
+        function loadGlobalSync() {
+            const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+            document.querySelectorAll('.global-control').forEach(s => {
+                const t = s.dataset.type;
+                const a = s.dataset.axis;
+                if (t === 'scale' && settings.scale) s.value = settings.scale;
+                else if (t === 'pos' && settings.pos && settings.pos[a] !== undefined) s.value = settings.pos[a];
+                else if (t === 'rot' && settings.rot && settings.rot[a] !== undefined) s.value = settings.rot[a];
+            });
+        }
+        window.addEventListener('load', loadGlobalSync);
+    </script>
 </body>
 
 </html>

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لغة الإشارة اليمنية - مسجل الإشارات | Yemeni Sign Language Recorder</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
 
     <!-- Loading Overlay Styles -->
     <style>
@@ -131,20 +132,23 @@
     <!-- Loading Overlay (hidden by default) -->
     <div id="loading-overlay" class="hidden">
         <div class="spinner"></div>
-        <div class="loading-text">جارٍ تحميل الذكاء الاصطناعي...</div>
+        <div class="loading-text" data-ar="جارٍ تحميل الذكاء الاصطناعي..." data-en="Loading AI Models...">جارٍ تحميل
+            الذكاء الاصطناعي...</div>
         <div class="loading-subtext">Loading AI Models...</div>
     </div>
 
     <!-- Error Message -->
     <div id="error-message">
-        <h3>⚠️ خطأ في الكاميرا</h3>
-        <p>Camera access was denied. Please allow camera access and try again.</p>
-        <button onclick="location.reload()">إعادة المحاولة | Retry</button>
+        <h3 data-ar="⚠️ خطأ في الكاميرا" data-en="⚠️ Camera Error">⚠️ خطأ في الكاميرا</h3>
+        <p data-ar="لم يتم السماح بالوصول للكاميرا." data-en="Camera access was denied.">Camera access was denied.
+            Please allow camera access and try again.</p>
+        <button onclick="location.reload()" data-ar="إعادة المحاولة" data-en="Retry">إعادة المحاولة | Retry</button>
     </div>
 
     <div id="app-container">
         <a href="welcome.html"
-            style="position: absolute; top: 20px; left: 20px; color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); z-index: 1000; font-family: sans-serif;">←
+            style="position: absolute; top: 20px; left: 20px; color: white; text-decoration: none; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); z-index: 1000; font-family: sans-serif;"
+            data-ar="← عودة" data-en="← Back">←
             Back | عودة</a>
         <!-- Left: Avatar Stage -->
         <div id="avatar-stage">
@@ -163,7 +167,19 @@
                 <a-entity light="type: point; color: #ff0050; intensity: 0.5; distance: 10"
                     position="-2 2 2"></a-entity>
 
-                <a-sky color="#1a1a2e"></a-sky> <!-- Dark background matching theme -->
+                <a-sky id="recorder-sky" color="#1a1a2e"></a-sky> <!-- Dark background matching theme -->
+
+                <script>
+                    window.addEventListener('themeChanged', (e) => {
+                        const sky = document.getElementById('recorder-sky');
+                        if (sky) sky.setAttribute('color', e.detail.theme === 'light' ? '#f0f2f5' : '#1a1a2e');
+                    });
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const theme = localStorage.getItem('theme') || 'dark';
+                        const sky = document.getElementById('recorder-sky');
+                        if (sky && theme === 'light') sky.setAttribute('color', '#f0f2f5');
+                    });
+                </script>
 
                 <!-- Avatar -->
                 <!-- Scaled up significantly (1.7) and positioned to show knees-up -->
@@ -181,48 +197,51 @@
 
         <!-- Right: Control Panel -->
         <div id="control-panel">
-            <h1>Sign Avatar</h1>
+            <h1 data-ar="أفاتار الإشارة" data-en="Sign Avatar">Sign Avatar</h1>
 
             <!-- Navigation Link -->
-
-            <!-- Navigation Link -->
-            <div
-                style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 0, 80, 0.1); border-radius: 12px; border: 1px solid rgba(255, 0, 80, 0.3);">
-                <a href="welcome.html"
-                    style="color: #ff0050; text-decoration: none; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                    🏠 Back to Home | العودة للرئيسية
-                </a>
-            </div>
-
-            <!-- Avatar Selector -->
-            <h3>Avatar Selection</h3>
-            <div
-                style="margin-bottom: 1.5rem; padding: 0.5rem; background: rgba(50, 50, 60, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.5rem;">🧛</span>
+            <!-- Compact Controls Bar (Consistent with Manual/Translator) -->
+            <div class="compact-controls"
+                style="display: flex; gap: 10px; padding: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--border-color); align-items: center; flex-wrap: wrap;">
+                <!-- Avatar Select -->
                 <select id="avatar-selector" onchange="changeAvatar(this.value)"
-                    style="width: 100%; background: transparent; border: none; color: #fff; font-size: 1rem; cursor: pointer; padding: 0.5rem; outline: none;">
-                    <option value="" disabled selected style="color: #333; background: #fff;">Select Avatar...</option>
+                    style="padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.1); color: var(--text-primary); border: 1px solid var(--border-color); flex: 1; outline: none;">
+                    <option value="" disabled selected>Select Avatar...</option>
                 </select>
-                <!-- Add style tag for options to ensure they are readable in drop down -->
-                <style>
-                    #avatar-selector option {
-                        color: #000;
-                        background: #fff;
-                    }
-                </style>
+
+                <!-- Mini Global Transforms -->
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--neon-teal);">Scale</span>
+                    <input type="range" class="global-control" data-type="scale" data-axis="y" min="0.5" max="2.5"
+                        step="0.1" value="1.7" style="width: 60px;" oninput="updateGlobal('scale', 'y', this.value)">
+                </div>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--neon-teal);">Rot Y</span>
+                    <input type="range" class="global-control" data-type="rot" data-axis="y" min="-180" max="180"
+                        step="5" value="0" style="width: 60px;" oninput="updateGlobal('rot', 'y', this.value)">
+                </div>
             </div>
+
+
 
             <!-- Tracking Source Control -->
-            <h3>Tracking Source</h3>
+            <h3 data-ar="مصدر التتبع" data-en="Tracking Source">Tracking Source</h3>
             <div class="mode-selector">
-                <button id="btn-cam" class="mode-btn" onclick="toggleSource('camera')">
+                <button id="btn-cam" class="mode-btn" onclick="toggleSource('camera')" data-ar="📷 كاميرا"
+                    data-en="📷 Camera">
                     📷 Camera
                 </button>
-                <button id="btn-vid" class="mode-btn" onclick="toggleSource('video')">
+                <button id="btn-switch-cam" class="mode-btn" onclick="window.globalUI?.switchCamera()"
+                    title="Switch Camera"
+                    style="flex: 0 0 auto; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    🔄
+                </button>
+                <button id="btn-vid" class="mode-btn" onclick="toggleSource('video')" data-ar="📁 فيديو"
+                    data-en="📁 Video">
                     📁 Video
                 </button>
                 <button id="btn-stop" class="mode-btn" onclick="toggleSource('stop')"
-                    style="background: rgba(255, 0, 80, 0.2); color: #ff0050;">
+                    style="background: rgba(255, 0, 80, 0.2); color: #ff0050;" data-ar="🛑 إيقاف" data-en="🛑 Stop">
                     🛑 Stop
                 </button>
             </div>
@@ -230,7 +249,8 @@
             <!-- Face Tracking Toggle -->
             <div style="margin-bottom: 1rem;">
                 <button id="btn-face" class="mode-btn active" onclick="toggleFaceTracking()"
-                    style="width: 100%; justify-content: center;">
+                    style="width: 100%; justify-content: center;" data-ar="👤 تتبع الوجه: مفعل"
+                    data-en="👤 Face Tracking: ON">
                     👤 Face Tracking: ON
                 </button>
             </div>
@@ -239,55 +259,67 @@
             <div
                 style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 242, 234, 0.1); border-radius: 12px; border: 1px solid rgba(0, 242, 234, 0.3);">
                 <label style="display: flex; justify-content: space-between; color: #00f2ea; margin-bottom: 0.5rem;">
-                    <span>⚡ Tracking Speed</span>
+                    <span data-ar="⚡ سرعة التتبع" data-en="⚡ Tracking Speed">⚡ Tracking Speed</span>
                     <span id="speed-value">85%</span>
                 </label>
                 <input type="range" id="speed-slider" min="20" max="100" value="85"
                     oninput="updateTrackingSpeed(this.value)" style="width: 100%; accent-color: #00f2ea;">
                 <div
                     style="display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem;">
-                    <span>Smooth</span>
-                    <span>Fast</span>
+                    <span data-ar="سلس" data-en="Smooth">Smooth</span>
+                    <span data-ar="سريع" data-en="Fast">Fast</span>
                 </div>
             </div>
 
             <!-- Mode Switcher -->
-            <h3>Mode</h3>
+            <h3 data-ar="الوضع" data-en="Mode">Mode</h3>
             <div class="mode-selector">
-                <button id="btn-recorder" class="mode-btn active" onclick="switchMode('recorder')">Recorder</button>
-                <button id="btn-translator" class="mode-btn" onclick="switchMode('translator')">Translator</button>
+                <button id="btn-recorder" class="mode-btn active" onclick="switchMode('recorder')" data-ar="مسجل"
+                    data-en="Recorder">Recorder</button>
+                <button id="btn-translator" class="mode-btn" onclick="switchMode('translator')" data-ar="مترجم"
+                    data-en="Translator">Translator</button>
             </div>
 
             <!-- Recorder Interface -->
             <div id="recorder-ui">
-                <h3>Recorder Studio</h3>
-                <p class="status-text">Capture your signs and build the dictionary.</p>
+                <h3 data-ar="استوديو التسجيل" data-en="Recorder Studio">Recorder Studio</h3>
+                <p class="status-text" data-ar="سجل إشاراتك لبناء القاموس" data-en="Capture your signs">Capture your
+                    signs and build the dictionary.</p>
 
                 <!-- Hand Mode Selection -->
                 <div
                     style="margin-bottom: 1rem; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
-                    <label style="display:block; color: #00f2ea; margin-bottom: 0.5rem; font-size: 0.9rem;">Active
+                    <label style="display:block; color: #00f2ea; margin-bottom: 0.5rem; font-size: 0.9rem;"
+                        data-ar="الأيدي النشطة" data-en="Active Hands">Active
                         Hands:</label>
                     <div style="display: flex; gap: 1rem; justify-content: space-around;">
                         <label><input type="radio" name="hand-mode" value="both" checked onchange="setHandMode('both')">
-                            Both</label>
-                        <label><input type="radio" name="hand-mode" value="left" onchange="setHandMode('left')"> Left
-                            Only</label>
-                        <label><input type="radio" name="hand-mode" value="right" onchange="setHandMode('right')"> Right
-                            Only</label>
+                            <span data-ar="كلاهما" data-en="Both">Both</span></label>
+                        <label><input type="radio" name="hand-mode" value="left" onchange="setHandMode('left')"> <span
+                                data-ar="يسار فقط" data-en="Left Only">Left
+                                Only</span></label>
+                        <label><input type="radio" name="hand-mode" value="right" onchange="setHandMode('right')"><span
+                                data-ar="يمين فقط" data-en="Right Only">Right
+                                Only</span></label>
                     </div>
                 </div>
 
                 <div class="input-group-vertical">
-                    <input type="text" id="anim-name-en" placeholder="English Name (Filename) e.g. hello">
-                    <input type="text" id="anim-name-ar" placeholder="Arabic Name (Label) e.g. مرحبا">
+                    <input type="text" id="anim-name-en" placeholder="English Name (Filename) e.g. hello"
+                        data-ar="اسم الملف (بالانجليزية)" data-en="English Name (Filename)">
+                    <input type="text" id="anim-name-ar" placeholder="Arabic Name (Label) e.g. مرحبا"
+                        data-ar="الاسم بالعربي" data-en="Arabic Name (Label)">
                 </div>
 
-                <button id="record-btn" class="action-btn">Start Recording</button>
-                <button id="stop-btn" class="action-btn" disabled style="background: #333;">Stop</button>
-                <button id="save-btn" class="action-btn" disabled style="background: #333;">Save Animation</button>
+                <button id="record-btn" class="action-btn" data-ar="بدء التسجيل" data-en="Start Recording">Start
+                    Recording</button>
+                <button id="stop-btn" class="action-btn" disabled style="background: #333;" data-ar="إيقاف"
+                    data-en="Stop">Stop</button>
+                <button id="save-btn" class="action-btn" disabled style="background: #333;" data-ar="حفظ الحركة"
+                    data-en="Save Animation">Save Animation</button>
 
-                <p id="recorder-status" class="status-text">Ready to record.</p>
+                <p id="recorder-status" class="status-text" data-ar="جاهز للتسجيل." data-en="Ready to record.">Ready to
+                    record.</p>
 
                 <!-- Hidden Video Input for 'Video' Button -->
                 <input type="file" id="video-upload" accept="video/*" style="display: none;">
@@ -295,23 +327,23 @@
 
             <!-- Translator Interface -->
             <div id="translator-ui" style="display:none;">
-                <h3>Translator Hub</h3>
-                <p class="status-text">Type text or speak to see the avatar sign it.</p>
+                <h3 data-ar="المترجم" data-en="Translator Hub">Translator Hub</h3>
+                <p class="status-text" data-ar="اكتب لترى الإشارة" data-en="Type text to sign">Type text or speak to see
+                    the avatar sign it.</p>
 
-                <!-- Language Toggle -->
-                <div class="lang-toggle">
-                    <label><input type="radio" name="lang-choice" value="ar" checked> Arabic (عربي)</label>
-                    <label><input type="radio" name="lang-choice" value="en"> English</label>
-                </div>
+                <!-- Language Toggle Section Removed - Replaced by Global UI -->
 
                 <div class="input-group">
-                    <input type="text" id="translator-input" placeholder="Type your sentence here...">
+                    <input type="text" id="translator-input" placeholder="Type your sentence here..."
+                        data-ar="اكتب جملتك هنا..." data-en="Type your sentence here...">
                     <button id="mic-btn" title="Speak">🎤</button>
                 </div>
 
-                <button id="play-btn" class="action-btn">Translate & Play</button>
+                <button id="play-btn" class="action-btn" data-ar="ترجم وشغل" data-en="Translate & Play">Translate &
+                    Play</button>
 
-                <p id="translator-status" class="status-text">Waiting for input...</p>
+                <p id="translator-status" class="status-text" data-ar="في انتظار الإدخال..."
+                    data-en="Waiting for input...">Waiting for input...</p>
             </div>
 
             <!-- Hidden Original Controls (Required for logic but hidden from UI) -->
@@ -320,6 +352,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Global UI Manager (Theme, Lang, Camera) -->
+    <script src="src/global-ui.js"></script>
 
     <script type="module">
         import MediapipeAvatarManager from './src/MediapipeAvatarManager.js'
@@ -375,7 +410,7 @@
         });
 
         holistic.setOptions({
-            modelComplexity: 1, // Balanced: faster loading, still accurate
+            modelComplexity: 0, // Lite: FASTEST startup and inference
             smoothLandmarks: true,
             enableSegmentation: false,
             smoothSegmentation: false,
@@ -471,8 +506,8 @@
                             await holistic.send({ image: videoElement });
                         }
                     },
-                    width: 1280,
-                    height: 720
+                    width: 640,
+                    height: 480
                 });
             }
 
@@ -628,12 +663,11 @@
                     console.error("Avatar object not found in loaded model");
                     return;
                 }
-                // Determine type (defaulting to RPM for now, can be sophisticated later)
                 const type = filename.toLowerCase().includes('robot') ? 'bipedRobot' : 'RPM';
 
                 avatarManager.bindAvatar(avatar, type);
-
-                // Show confirmation or perform any cleanup
+                // PERSISTENCE (V5)
+                if (window.loadGlobalSettings) window.loadGlobalSettings();
             };
 
             avatarEl.addEventListener('model-loaded', newOnLoaded, { once: true });
@@ -642,6 +676,67 @@
             // Note: A-frame might cache models. Adding a timestamp could force reload if needed, but not usually for local files.
             avatarEl.setAttribute('src', `avatars/${filename}`);
         }
+        function updateGlobal(type, axis, value) {
+            const avatarEl = document.getElementById('male');
+            if (!avatarEl) return;
+            const floatVal = parseFloat(value);
+            if (type === 'scale') {
+                avatarEl.setAttribute('scale', `${floatVal} ${floatVal} ${floatVal}`);
+            } else if (type === 'pos') {
+                const currentPos = avatarEl.getAttribute('position');
+                currentPos[axis] = floatVal;
+                avatarEl.setAttribute('position', currentPos);
+            } else if (type === 'rot') {
+                const currentRot = avatarEl.getAttribute('rotation');
+                currentRot[axis] = floatVal;
+                avatarEl.setAttribute('rotation', currentRot);
+            }
+
+            // PERSISTENCE (V5)
+            const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+            if (!settings[type]) settings[type] = {};
+            if (type === 'scale') settings[type] = floatVal;
+            else settings[type][axis] = floatVal;
+            localStorage.setItem('avatarSettings', JSON.stringify(settings));
+        }
+        window.updateGlobal = updateGlobal;
+
+        function loadGlobalSettings() {
+            const settings = JSON.parse(localStorage.getItem('avatarSettings') || '{}');
+            const avatarEl = document.getElementById('male');
+            if (!avatarEl || !settings) return;
+
+            if (settings.scale) avatarEl.setAttribute('scale', `${settings.scale} ${settings.scale} ${settings.scale}`);
+            if (settings.pos) {
+                const p = avatarEl.getAttribute('position');
+                if (settings.pos.x !== undefined) p.x = settings.pos.x;
+                if (settings.pos.y !== undefined) p.y = settings.pos.y;
+                if (settings.pos.z !== undefined) p.z = settings.pos.z;
+                avatarEl.setAttribute('position', p);
+            }
+            if (settings.rot) {
+                const r = avatarEl.getAttribute('rotation');
+                if (settings.rot.y !== undefined) r.y = settings.rot.y;
+                avatarEl.setAttribute('rotation', r);
+            }
+
+            // Sync UI Sliders
+            document.querySelectorAll('.control-card input[type="range"]').forEach(s => {
+                const oninput = s.getAttribute('oninput');
+                if (oninput && oninput.includes('updateGlobal')) {
+                    const match = oninput.match(/updateGlobal\('([^']+)',\s*'([^']+)'/);
+                    if (match) {
+                        const t = match[1];
+                        const a = match[2];
+                        if (t === 'scale' && settings.scale) s.value = settings.scale;
+                        else if (t === 'pos' && settings.pos && settings.pos[a] !== undefined) s.value = settings.pos[a];
+                        else if (t === 'rot' && settings.rot && settings.rot[a] !== undefined) s.value = settings.rot[a];
+                    }
+                }
+            });
+        }
+        window.loadGlobalSettings = loadGlobalSettings;
+
         window.changeAvatar = changeAvatar;
 
         async function fetchAvatarList() {

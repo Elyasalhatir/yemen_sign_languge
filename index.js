@@ -24,8 +24,26 @@ app.post('/save-animation', (req, res) => {
         return res.status(400).send('Missing englishName or frames');
     }
 
-    // Save Animation File (using English name)
     const filePath = `${animationsDir}/${englishName}.json`;
+    const dictPath = __dirname + '/public/dictionary.json';
+
+    // Load dictionary for duplicate check
+    let dictionary = {};
+    if (fs.existsSync(dictPath)) {
+        try {
+            dictionary = JSON.parse(fs.readFileSync(dictPath, 'utf8'));
+        } catch (e) { console.error("Error reading dictionary:", e); }
+    }
+
+    // Check for duplicates
+    if (fs.existsSync(filePath)) {
+        return res.status(409).json({ error: 'DUPLICATE_ENGLISH', message: `Animation "${englishName}" already exists | الاسم الإنجليزي موجود مسبقاً` });
+    }
+    if (arabicName && dictionary[arabicName]) {
+        return res.status(409).json({ error: 'DUPLICATE_ARABIC', message: `Arabic name "${arabicName}" already exists | الاسم العربي موجود مسبقاً` });
+    }
+
+    // Save Animation File
     fs.writeFile(filePath, JSON.stringify(frames), (err) => {
         if (err) {
             console.error(err);
@@ -34,36 +52,16 @@ app.post('/save-animation', (req, res) => {
 
         // Update Dictionary if Arabic name is provided
         if (arabicName) {
-            const dictPath = __dirname + '/public/dictionary.json';
-            let dictionary = {};
-
-            // Load existing dictionary
-            if (fs.existsSync(dictPath)) {
-                try {
-                    const data = fs.readFileSync(dictPath, 'utf8');
-                    dictionary = JSON.parse(data);
-                } catch (e) {
-                    console.error("Error reading dictionary:", e);
-                }
-            }
-
-            // Update dictionary
             dictionary[arabicName] = englishName;
-
-            // Save dictionary
             fs.writeFile(dictPath, JSON.stringify(dictionary, null, 2), (err) => {
-                if (err) {
-                    console.error("Error saving dictionary:", err);
-                    // Don't fail the whole request if dictionary fails, but log it
-                }
+                if (err) console.error("Error saving dictionary:", err);
                 console.log(`Saved animation: ${englishName} (Arabic: ${arabicName})`);
-                res.send('Animation and dictionary saved successfully');
+                res.json({ success: true, message: `Saved: ${englishName} (${arabicName})` });
             });
         } else {
             console.log(`Saved animation: ${englishName}`);
-            res.send('Animation saved successfully');
+            res.json({ success: true, message: `Saved: ${englishName}` });
         }
-
     });
 });
 
