@@ -82,6 +82,7 @@ class GlobalUIManager {
 
     /* --- THEME LOGIC --- */
     applyTheme(theme) {
+        if (!document.body) return; // Guard
         if (theme === 'light') {
             document.body.classList.add('light-mode');
         } else {
@@ -94,8 +95,8 @@ class GlobalUIManager {
 
     /* --- LANGUAGE LOGIC --- */
     applyLanguage(lang) {
-        // 1. Update Layout Direction (DISABLED per user request)
-        // document.body.dir = lang === 'ar' ? 'rtl' : 'ltr'; 
+        const body = document.body;
+        if (!body) return; // Guard for early calls
 
         // 2. Update all elements with data-ar / data-en attributes
         const TranslatableElements = document.querySelectorAll('[data-ar]');

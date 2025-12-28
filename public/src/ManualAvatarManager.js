@@ -19,6 +19,13 @@ class ManualAvatarManager {
         console.log("Premium Manager: Avatar Bound");
     }
 
+    setAvatar(filename) {
+        const avatarEl = document.getElementById('avatar') || document.getElementById('male');
+        if (avatarEl) {
+            avatarEl.setAttribute('src', 'avatars/' + filename);
+        }
+    }
+
     getBone(boneName) {
         // Advanced recursive lookup with naming variance
         let bone = null;
@@ -41,9 +48,9 @@ class ManualAvatarManager {
             if (root) {
                 root.traverse(child => {
                     if (child.isBone && !bone) {
-                        const cleanName = child.name.toLowerCase();
+                        const cleanName = child.name.replace(/^.*:/, '').toLowerCase(); // Strip prefixes like 'AvatarRoot:'
                         const searchName = boneName.toLowerCase();
-                        if (cleanName === searchName || cleanName.endsWith(':' + searchName) || cleanName.endsWith(searchName)) {
+                        if (cleanName === searchName || cleanName.endsWith(searchName)) {
                             bone = child;
                         }
                     }
@@ -98,6 +105,8 @@ class ManualAvatarManager {
             const currentRot = avatarEl.getAttribute('rotation');
             currentRot[axis] = floatVal;
             avatarEl.setAttribute('rotation', currentRot);
+        } else if (type === 'scale') {
+            avatarEl.setAttribute('scale', `${floatVal} ${floatVal} ${floatVal}`);
         }
 
         // PERSISTENCE (V5)
@@ -169,18 +178,19 @@ class ManualAvatarManager {
 
     _applyFinger(handSide, fingerName, type, value) {
         if (type === 'curl') {
-            // Joint Chain Curl (1, 2, & 3 for natural closure)
-            const joints = (fingerName === 'Thumb') ? [2, 3] : [1, 2, 3];
+            // Joint Chain Curl
+            // Thumb uses 0,1,2; Others use 1,2,3
+            const joints = (fingerName === 'Thumb') ? [0, 1, 2] : [1, 2, 3];
             let axis = (fingerName === 'Thumb') ? 'y' : 'x';
 
             joints.forEach(i => {
                 const bName = `${handSide}Hand${fingerName}${i}`;
                 let dir = (handSide === 'Right' && fingerName === 'Thumb') ? -1 : 1;
 
-                // MULTIPLIER TWEAK: Knuckle (1) bends less, mid/tips (2,3) bend more for realistic fist
+                // Multipliers for natural closure
                 let multiplier = 1.5;
-                if (i === 1) multiplier = 1.1; // Base bend
-                if (i === 3) multiplier = 1.8; // Tip bend (tighter)
+                if (i === 1 || i === 0) multiplier = 1.1;
+                if (i === 3 || i === 2) multiplier = 1.8;
 
                 this._applyBoneRotation(bName, axis, value * multiplier * dir);
             });
@@ -188,7 +198,11 @@ class ManualAvatarManager {
             // Hyper-Granular Segment Control (e.g., k_x_idx_1)
             const parts = type.split('_'); // k, x, idx, 1
             const axis = parts[1];
-            const index = parts[3];
+            let index = parseInt(parts[3]);
+
+            // MAPPING FIX: UI 1-2-3 maps to Bone 0-1-2 for Thumb, 1-2-3 for others
+            if (fingerName === 'Thumb') index = index - 1;
+
             const bName = `${handSide}Hand${fingerName}${index}`;
             this._applyBoneRotation(bName, axis, value);
         } else if (type.startsWith('k_')) {

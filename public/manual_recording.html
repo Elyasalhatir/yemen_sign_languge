@@ -14,196 +14,142 @@
 
     <style>
         :root {
-            --glass: rgba(16, 16, 32, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --neon-teal: #00f2ea;
-            --neon-pink: #ff0050;
-            --bg-dark: #0a0a12;
-            --panel-width: 450px;
+            --primary: #00f2ea;
+            --secondary: #ff0050;
+            --bg-dark: #050508;
+            --bg-panel: rgba(10, 10, 16, 0.65);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --panel-width: 800px;
+            /* Widened to 800px as requested */
+            --easing: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Override vars based on theme.css classes if present */
+        body.light-mode {
+            --text-main: var(--text-primary);
+            --text-muted: var(--text-secondary);
+            --bg-panel: var(--bg-secondary);
+            --glass: var(--bg-glass);
+            --glass-hover: var(--bg-glass-hover);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
+            margin: 0;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            margin: 0;
-            display: flex;
-            background: var(--bg-dark);
-            color: #fff;
+            background: var(--bg-primary);
+            /* Use theme variable for background */
+            color: var(--text-main);
             font-family: 'Outfit', 'Noto Kufi Arabic', sans-serif;
+            display: flex;
         }
 
+        /* --- LAYOUT CONTAINER --- */
         #app-container {
             display: flex;
             width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background: var(--bg-primary);
+            height: 100%;
             flex-direction: row-reverse;
             /* Sidebar on Right */
         }
 
-        /* --- STAGE (Left/Main) --- */
-        #avatar-stage {
-            flex: 1;
-            position: relative;
-            background: var(--bg-primary);
-            /* background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%); */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Floating Nav */
-        .floating-nav {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            /* right: auto; */
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-        }
-
-        .premium-btn-back {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .premium-btn-back:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--neon-teal);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 242, 234, 0.2);
-        }
-
-        /* --- SIDEBAR (Right) --- */
+        /* --- SIDEBAR (CONTROLS) --- */
         #control-panel {
             width: var(--panel-width);
+            min-width: 350px;
             height: 100%;
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            border-right: 1px solid var(--glass-border);
+            background: var(--bg-panel);
+            backdrop-filter: blur(30px) saturate(120%);
+            border-left: 1px solid var(--border);
+            /* Changed to left border since it is on right */
             display: flex;
             flex-direction: column;
-            padding: 0;
-            z-index: 200;
-            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
         }
 
         .panel-header {
-            padding: 2rem 1.5rem;
-            background: linear-gradient(180deg, rgba(0, 242, 234, 0.05) 0%, transparent 100%);
-            border-bottom: 1px solid var(--glass-border);
+            padding: 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .panel-header h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
             margin: 0;
-            background: linear-gradient(90deg, #fff, var(--neon-teal));
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .panel-header p {
+            margin: 6px 0 0;
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin: 5px 0 0 0;
-            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: var(--text-muted);
         }
 
         .controls-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5rem;
-            scrollbar-gutter: stable;
+            overflow-x: hidden;
+            padding: 24px;
         }
 
-        /* Mobile Fix */
-        @media (max-width: 1100px) {
-            #app-container {
-                flex-direction: column !important;
-                /* Stack Vertically */
-            }
-
-            #avatar-stage {
-                order: 1;
-                /* Top */
-                height: 45vh !important;
-                width: 100%;
-                position: sticky;
-                top: 0;
-                z-index: 500;
-            }
-
-            #control-panel {
-                order: 2;
-                /* Bottom */
-                width: 100% !important;
-                height: auto;
-                flex: 1;
-                overflow-y: visible;
-                /* Let body handle scroll or container */
-            }
-
-            .controls-scroll {
-                overflow-y: auto;
-                height: 55vh;
-                /* Scroll within panel area */
-            }
+        .controls-scroll::-webkit-scrollbar {
+            width: 6px;
         }
 
-        /* Premium Group */
+        .controls-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* --- CONTROL GROUPS --- */
         .control-group {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--glass);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s var(--easing);
         }
 
         .control-group:hover {
-            border-color: rgba(0, 242, 234, 0.3);
-            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--glass-hover);
         }
 
         .group-header {
-            padding: 1rem 1.2rem;
+            padding: 18px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
             user-select: none;
-            background: rgba(255, 255, 255, 0.02);
         }
 
-        .group-header span.title {
+        .group-header .title {
             font-weight: 600;
+            color: var(--text-main);
             font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: rgba(255, 255, 255, 0.9);
         }
 
         .group-header .chevron {
-            font-size: 0.8rem;
-            opacity: 0.5;
-            transition: transform 0.3s ease;
+            color: var(--text-muted);
+            transition: transform 0.3s var(--easing);
         }
 
         .control-group.collapsed .group-body {
@@ -215,274 +161,254 @@
         }
 
         .group-body {
-            padding: 1.2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 20px 20px 20px;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Sliders */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- INPUTS & SLIDERS --- */
         .control-row {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
 
         .control-row:last-child {
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
         }
 
         .label-box {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 8px;
             align-items: center;
-            margin-bottom: 0.6rem;
         }
 
         .label-box label {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
             font-weight: 500;
         }
 
         .value-badge {
-            font-family: monospace;
-            font-size: 0.75rem;
             background: rgba(0, 242, 234, 0.1);
-            color: var(--neon-teal);
-            padding: 2px 6px;
-            border-radius: 4px;
-            min-width: 35px;
-            text-align: center;
+            color: var(--primary);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            border: 1px solid rgba(0, 242, 234, 0.2);
         }
 
         input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 4px;
+            height: 6px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            appearance: none;
             outline: none;
+            cursor: pointer;
         }
 
         input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
             background: #fff;
-            border: 3px solid var(--neon-teal);
+            border: 2px solid var(--bg-dark);
             border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 242, 234, 0.5);
-            transition: scale 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
-            scale: 1.2;
+            transform: scale(1.3);
+            background: var(--primary);
         }
 
-        /* Avatar Selection Options */
-        #avatar-selector {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            /* Text visible on dark bg */
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        select,
+        .premium-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s;
         }
 
-        #avatar-selector option {
-            background-color: #333;
-            /* Dark background for dropdown */
-            color: #fff;
-            /* White text */
+        select:focus,
+        .premium-input:focus {
+            border-color: var(--primary);
         }
 
-        /* --- TIMELINE (Bottom) --- */
-        #timeline-premium {
+        /* --- MAIN STAGE --- */
+        #avatar-stage {
+            flex: 1;
+            position: relative;
+            background: transparent;
+            /* Grid/Environment handled by A-Frame, mainly transparent to show body bg gradient */
+        }
+
+        .floating-nav {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            right: calc(var(--panel-width) + 30px);
-            height: 100px;
-            background: rgba(10, 10, 20, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            padding: 0 1.5rem;
-            gap: 1.5rem;
+            top: 25px;
+            left: 25px;
             z-index: 50;
         }
 
-        .timeline-main {
-            flex: 1;
+        /* Utilities */
+        .highlight-box {
+            background: rgba(0, 242, 234, 0.05);
+            border: 1px solid rgba(0, 242, 234, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .highlight-box label {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Fingers Grid */
+        .fingers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .finger-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .finger-card:hover {
+            border-color: rgba(0, 242, 234, 0.3) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .value-badge.mini {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            font-family: monospace;
+        }
+
+        .t-btn.mini {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+        }
+
+        /* Finger Tabs Styling */
+        .finger-tabs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .tabs-header {
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding: 10px 0;
-            scrollbar-width: none;
+            padding: 5px 2px 12px 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .timeline-main::-webkit-scrollbar {
-            display: none;
+        .tabs-header::-webkit-scrollbar {
+            height: 4px;
+            display: block;
+            /* Show scrollbar for discoverability */
         }
 
-        .keyframe-node {
-            min-width: 45px;
-            height: 60px;
+        .tabs-header::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .tab-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border: 1px solid var(--border);
+            color: #ccc;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            /* CRITICAL: Prevent buttons from collapsing */
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.2), rgba(0, 255, 127, 0.2));
+            border-color: #00f2ea;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 242, 234, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flex-col {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .keyframe-node span {
-            font-size: 0.7rem;
-            opacity: 0.5;
-            margin-top: 4px;
-        }
-
-        .keyframe-node.active {
-            background: var(--neon-teal);
-            border-color: #fff;
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 242, 234, 0.4);
-        }
-
-        .keyframe-node.active span {
-            opacity: 0.8;
-        }
-
-        .timeline-btns {
-            display: flex;
             gap: 8px;
         }
 
-        .t-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            cursor: pointer;
+        .flex-row {
             display: flex;
+            gap: 8px;
             align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            font-size: 1.1rem;
         }
 
-        .t-btn:hover {
-            background: rgba(0, 242, 234, 0.1);
-            border-color: var(--neon-teal);
-            color: var(--neon-teal);
-        }
-
-        .t-btn.primary {
-            background: var(--neon-teal);
-            color: #000;
-            border: none;
-        }
-
-        .t-btn.danger {
-            background: rgba(255, 0, 80, 0.1);
-            border-color: var(--neon-pink);
-            color: var(--neon-pink);
-        }
-
-        .t-btn.danger:hover {
-            background: var(--neon-pink);
-            color: #fff;
-        }
-
-        /* Save Modal / Panel Section */
-        .save-section {
-            padding: 1.5rem;
-            border-top: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .premium-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
-            padding: 12px 15px;
-            border-radius: 10px;
-            color: white;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            transition: border 0.3s;
-        }
-
-        .premium-input:focus {
-            border-color: var(--neon-teal);
-            outline: none;
-        }
-
-        .premium-btn-save {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            background: linear-gradient(90deg, var(--neon-teal), #00d2ff);
-            color: #000;
-            font-weight: 800;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .premium-btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 242, 234, 0.3);
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 1100px) {
-            #app-container {
-                flex-direction: column-reverse;
-                /* Controls First in DOM, Avatar Second... Wait. Flex-direction reverses visual order. */
-                /* HTML: Control Panel (1), Avatar Stage (2) */
-                /* column: Control Top, Avatar Bottom */
-                /* column-reverse: Avatar Top, Control Bottom */
-            }
-
-            #avatar-stage {
-                height: 45vh;
-                /* Fixed height for sticky avatar */
-                flex: none;
-                /* Don't grow/shrink */
-                width: 100%;
-                z-index: 10;
-            }
-
-            #control-panel {
-                height: 55vh;
-                /* Remaining space */
-                flex: none;
-                width: 100%;
-                overflow-y: auto;
-            }
-
-            #timeline-premium {
-                left: 10px;
-                right: 10px;
-                bottom: 10px;
-                height: 80px;
-                padding: 0 1rem;
-            }
-
-            .floating-nav {
-                top: 10px;
-                left: 10px;
-            }
-        }
-
-        /* Utilities */
         .sync-toggle {
             display: flex;
             align-items: center;
@@ -494,55 +420,243 @@
             margin-bottom: 1rem;
         }
 
-        /* Preset Buttons */
-        .preset-btn {
-            width: 48px;
-            height: 48px;
-            font-size: 1.5rem;
+        .premium-btn-back {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .premium-btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- TIMELINE (Floating Bottom) --- */
+        #timeline-premium {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            right: 30px;
+            /* Constrained within avatar-stage */
+            height: 60px;
+            /* Reduced height to 60px */
+            background: rgba(10, 10, 16, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 50;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .timeline-main {
+            flex: 1;
+            /* Takes available space */
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+            scrollbar-width: none;
+            height: 100%;
+            align-items: center;
+        }
+
+        .keyframe-node {
+            min-width: 35px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
-        .preset-btn:hover {
-            background: rgba(0, 242, 234, 0.2);
-            border-color: var(--neon-teal);
-            transform: scale(1.1);
+        .keyframe-node.active {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.4);
+            border-color: var(--primary);
         }
 
-        .preset-btn:active {
-            transform: scale(0.95);
+        .t-btn {
+            width: 35px;
+            /* Smaller button size */
+            height: 35px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .t-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .t-btn.primary {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 242, 234, 0.3);
+        }
+
+        .t-btn.danger {
+            color: var(--secondary);
+            border-color: rgba(255, 0, 80, 0.3);
+            background: rgba(255, 0, 80, 0.1);
+        }
+
+        .t-btn.danger:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .premium-btn-save {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--primary), #00d2ff);
+            color: #000;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .premium-btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 242, 234, 0.3);
+        }
+
+        /* --- MOBILE & TABLET --- */
+        @media (max-width: 1024px) {
+            body {
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                height: auto !important;
+                display: block;
+            }
+
+            /* Allow natural scroll */
+
+            #app-container {
+                display: block;
+                width: 100vw !important;
+                height: auto !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+                /* CRITICAL: backdrop-filter breaks position: fixed in some browsers */
+            }
+
+            #avatar-stage {
+                height: 45vh !important;
+                width: 100vw !important;
+                position: fixed !important;
+                /* FIXED positioning */
+                top: 0 !important;
+                /* Pinned back to TOP as requested */
+                bottom: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 99999 !important;
+                /* Extremely high to beat any other element */
+                background: var(--bg-primary) !important;
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5) !important;
+            }
+
+            #control-panel {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: var(--bg-primary) !important;
+                overflow: visible !important;
+                padding-top: 45vh !important;
+                /* Push content DOWN by viewport height */
+                padding-bottom: 20px !important;
+            }
+
+            .controls-scroll {
+                overflow: visible;
+                height: auto;
+            }
+
+            #timeline-premium {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                height: 50px;
+                padding: 5px 15px;
+            }
+
+            .t-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Essential Utility for Finger Detail Toggle */
+        .hidden {
+            display: none !important;
         }
     </style>
+    <!-- Removing head load to prevent document.body null errors -->
+    <!-- <script src="src/global-ui.js"></script> -->
 </head>
 
 <body class="yemeni-theme">
     <div id="app-container">
         <!-- Sidebar (Right) -->
         <div id="control-panel">
-            <!-- Compact Controls Bar (Similar to Translator) -->
+            <!-- Compact Controls Bar -->
             <div class="compact-controls"
-                style="display: flex; gap: 10px; padding: 10px; background: var(--bg-glass); border-bottom: 1px solid var(--border-color); align-items: center; flex-wrap: wrap;">
+                style="padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center;">
                 <!-- Avatar Select -->
-                <select id="avatar-selector" onchange="manualManager.setAvatar(this.value)"
-                    style="padding: 5px; border-radius: 8px; background: rgba(0,0,0,0.2); color: var(--text-primary); border: 1px solid var(--border-color);">
+                <select id="avatar-selector" onchange="manualManager.setAvatar(this.value)" style="flex: 1;">
                     <option value="male.glb">👱 Male</option>
                     <option value="female.glb">👩 Female</option>
                 </select>
 
-                <!-- Mini Global Transforms -->
-                <div style="display: flex; gap: 5px; align-items: center;">
-                    <span style="font-size: 0.8rem; color: var(--neon-teal);">Scale</span>
-                    <input type="range" min="0.5" max="2.5" step="0.1" value="1.7" style="width: 60px;"
-                        oninput="updateGlobal('scale', 'y', this.value)">
-                </div>
-                <div style="display: flex; gap: 5px; align-items: center;">
-                    <span style="font-size: 0.8rem; color: var(--neon-teal);">Rot Y</span>
-                    <input type="range" min="-180" max="180" step="5" value="0" style="width: 60px;"
-                        oninput="updateGlobal('rot', 'y', this.value)">
-                </div>
+                <!-- Mini Global Transforms REMOVED as requested -->
             </div>
 
             <div class="panel-header">
@@ -561,35 +675,40 @@
                     </div>
                     <div class="group-body">
                         <div class="control-row">
-                            <div class="label-box"><label>الحجم (Scale)</label><span class="value-badge">1.7</span>
+                            <div class="label-box"><label data-ar="الحجم (Scale)" data-en="Scale">الحجم
+                                    (Scale)</label><span class="value-badge">1.7</span>
                             </div>
                             <input type="range" class="global-control" data-type="scale" min="0.5" max="3" step="0.1"
-                                value="1.7">
+                                value="1.7" oninput="manualManager.updateGlobal('scale', 'all', this.value)">
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>العمق (Position Z)</label><span class="value-badge">-1</span>
+                            <div class="label-box"><label data-ar="العمق (Position Z)" data-en="Position Z">العمق
+                                    (Position Z)</label><span class="value-badge">-1</span>
                             </div>
                             <input type="range" class="global-control" data-type="pos" data-axis="z" min="-5" max="2"
-                                step="0.1" value="-1">
+                                step="0.1" value="-1" oninput="manualManager.updateGlobal('pos', 'z', this.value)">
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>الارتفاع (Position Y)</label><span
-                                    class="value-badge">-1.1</span>
+                            <div class="label-box"><label data-ar="الارتفاع (Position Y)" data-en="Position Y">الارتفاع
+                                    (Position Y)</label><span class="value-badge">-1.1</span>
                             </div>
                             <input type="range" class="global-control" data-type="pos" data-axis="y" min="-3" max="1"
-                                step="0.1" value="-1.1">
+                                step="0.1" value="-1.1" oninput="manualManager.updateGlobal('pos', 'y', this.value)">
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>الجانب (Position X)</label><span class="value-badge">0</span>
+                            <div class="label-box"><label data-ar="الجانب (Position X)" data-en="Position X">الجانب
+                                    (Position X)</label><span class="value-badge">0</span>
                             </div>
                             <input type="range" class="global-control" data-type="pos" data-axis="x" min="-2" max="2"
-                                step="0.1" value="0">
+                                step="0.1" value="0" oninput="manualManager.updateGlobal('pos', 'x', this.value)">
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>الدوران (Rotation Y)</label><span class="value-badge">0</span>
+                            <div class="label-box"><label data-ar="الدوران (Rotation Y)" data-en="Rotation Y">الدوران
+                                    (Rotation Y)</label><span class="value-badge">0</span>
                             </div>
                             <input type="range" class="global-control" data-type="rot" data-axis="y" min="-180"
-                                max="180" step="1" value="0">
+                                max="180" step="1" value="0"
+                                oninput="manualManager.updateGlobal('rot', 'y', this.value)">
                         </div>
                     </div>
                 </div>
@@ -603,13 +722,14 @@
                     </div>
                     <div class="group-body">
                         <div class="control-row">
-                            <label>اختر الشخصية</label>
+                            <label data-ar="اختر الشخصية" data-en="Select Character">اختر الشخصية</label>
                             <select id="avatar-selector" onchange="changeAvatar(this.value)" class="premium-input">
                                 <option value="" disabled selected>جاري التحميل...</option>
                             </select>
                         </div>
                         <div class="sync-toggle">
-                            <span style="font-size: 0.9rem; font-weight: 600;">🔗 التزامن (Mirror)</span>
+                            <span style="font-size: 0.9rem; font-weight: 600;" data-ar="🔗 التزامن (Mirror)"
+                                data-en="🔗 Mirror Mode">🔗 التزامن (Mirror)</span>
                             <label class="switch">
                                 <input type="checkbox" id="mirror-mode"
                                     style="width: 25px; height: 25px; accent-color: var(--neon-teal);">
@@ -623,12 +743,14 @@
                 <!-- SPINE & CORE -->
                 <div class="control-group collapsed">
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">🧍 الجذع والظهر (Spine & Core)</span>
+                        <span class="title" data-ar="🧍 الجذع والظهر (Spine & Core)" data-en="🧍 Spine & Core">🧍 الجذع
+                            والظهر (Spine & Core)</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
                         <div class="control-row">
-                            <div class="label-box"><label>الصدر (Chest 3D)</label></div>
+                            <div class="label-box"><label data-ar="الصدر (Chest 3D)" data-en="Chest (3D)">الصدر (Chest
+                                    3D)</label></div>
                             <div style="display:flex; gap:8px;">
                                 <input type="range" class="bone-control" data-bone="Spine2" data-axis="x" min="-1"
                                     max="1" step="0.1" value="0" title="Bend">
@@ -639,7 +761,8 @@
                             </div>
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>العمود الفقري (Spine 3D)</label></div>
+                            <div class="label-box"><label data-ar="العمود الفقري (Spine 3D)" data-en="Spine (3D)">العمود
+                                    الفقري (Spine 3D)</label></div>
                             <div style="display:flex; gap:8px;">
                                 <input type="range" class="bone-control" data-bone="Spine" data-axis="x" min="-1"
                                     max="1" step="0.1" value="0" title="Bend">
@@ -653,84 +776,68 @@
                 </div>
 
                 <!-- RIGHT UPPER BODY -->
-                <div class="control-group">
+                <div class="control-group"> <!-- Expanded by default -->
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">💪 الذراع الأيمن (Right Arm)</span>
+                        <span class="title" data-ar="💪 الذراع الأيمن (Right Arm)" data-en="💪 Right Arm">💪 الذراع
+                            الأيمن (Right Arm)</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
                         <!-- Combined Chain Control -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.1); padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(0,242,234,0.3);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 700;">🔗 تحكم
-                                    مدمج (Combined Control)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:8px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">X (Bend)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Right', 'x', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">Y (Twist)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Right', 'y', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">Z (Roll)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Right', 'z', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
+                        <div class="highlight-box">
+                            <label data-ar="🔗 تحكم مدمج (Combined Control)" data-en="🔗 Combined Control">🔗 تحكم مدمج
+                                (Combined Control)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Bend</span><input
+                                        type="range" oninput="manualManager.updateCombined('Right', 'x', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Twist</span><input
+                                        type="range" oninput="manualManager.updateCombined('Right', 'y', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Roll</span><input
+                                        type="range" oninput="manualManager.updateCombined('Right', 'z', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <!-- Arm + Elbow Combined -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(0,242,234,0.2);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 600;">💪 ذراع +
-                                    مرفق (Arm + Elbow)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="display:flex; align-items:center;"><span style="width:20px">X</span><input
-                                        type="range" style="flex:1"
+                        <div class="highlight-box">
+                            <label data-ar="💪 ذراع + مرفق (Arm + Elbow)" data-en="💪 Arm + Elbow">💪 ذراع + مرفق (Arm +
+                                Elbow)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span>X</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Right', 'x', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Y</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Y</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Right', 'y', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Z</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Z</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Right', 'z', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <!-- Elbow + Wrist Combined -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(0,242,234,0.2);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 600;">✋ مرفق +
-                                    معصم (Elbow + Wrist)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="display:flex; align-items:center;"><span style="width:20px">X</span><input
-                                        type="range" style="flex:1"
+                        <div class="highlight-box">
+                            <label data-ar="✋ مرفق + معصم (Elbow + Wrist)" data-en="✋ Elbow + Wrist">✋ مرفق + معصم
+                                (Elbow + Wrist)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span>X</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Right', 'x', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Y</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Y</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Right', 'y', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Z</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Z</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Right', 'z', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <div class="control-row">
-                            <div class="label-box"><label>الكتف (Shoulder 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="الكتف (Shoulder 360°)"
+                                    data-en="Shoulder (360°)">الكتف (Shoulder 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="RightArm" data-axis="x" min="-3.14"
                                     max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="RightArm" data-axis="y" min="-3.14"
@@ -739,17 +846,19 @@
                                     max="3.14" step="0.1" value="0" title="Z">
                             </div>
                         </div>
+
                         <!-- Hand Chain Control -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-                            <div class="label-box"><label style="color: var(--neon-teal);">🔗 سلسلة اليد (Hand
-                                    Chain)</label></div>
+                        <div class="highlight-box">
+                            <label data-ar="🔗 سلسلة اليد (Hand Chain)" data-en="🔗 Hand Chain">🔗 سلسلة اليد (Hand
+                                Chain)</label>
                             <input type="range" oninput="manualManager.updateHandChain('Right', this.value)" min="-3.14"
                                 max="3.14" step="0.1" value="0">
                         </div>
+
                         <div class="control-row">
-                            <div class="label-box"><label>المرفق (Forearm 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="المرفق (Forearm 360°)"
+                                    data-en="Forearm (360°)">المرفق (Forearm 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="RightForeArm" data-axis="x"
                                     min="-3.14" max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="RightForeArm" data-axis="y"
@@ -758,9 +867,11 @@
                                     min="-3.14" max="3.14" step="0.1" value="0" title="Z">
                             </div>
                         </div>
+
                         <div class="control-row">
-                            <div class="label-box"><label>المعصم (Wrist 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="المعصم (Wrist 360°)" data-en="Wrist (360°)">المعصم
+                                    (Wrist 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="RightHand" data-axis="x" min="-3.14"
                                     max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="RightHand" data-axis="y" min="-3.14"
@@ -773,101 +884,85 @@
                 </div>
 
                 <!-- RIGHT FINGERS -->
-                <div class="control-group collapsed">
+                <div class="control-group">
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">🖐️ أصابع اليد اليمنى</span>
+                        <span class="title" data-ar="🖐️ أصابع اليد اليمنى" data-en="🖐️ Right Fingers">🖐️ أصابع اليد
+                            اليمنى</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.05); padding: 10px; border-radius: 12px;">
-                            <div class="label-box"><label style="color: var(--neon-teal);">✊ Fist Mastery</label></div>
+                        <div class="highlight-box">
+                            <label>✊ Fist Mastery (Right)</label>
                             <input type="range" oninput="manualManager.updateFist('Right', this.value)" min="0" max="1"
                                 step="0.05" value="0">
                         </div>
-                        <div id="right-fingers-ui"></div>
+                        <div id="right-fingers-ui" class="fingers-grid"></div>
                     </div>
                 </div>
 
                 <!-- LEFT UPPER BODY -->
                 <div class="control-group collapsed">
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">💪 الذراع الأيسر (Left Arm)</span>
+                        <span class="title" data-ar="💪 الذراع الأيسر (Left Arm)" data-en="💪 Left Arm">💪 الذراع الأيسر
+                            (Left Arm)</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
                         <!-- Combined Chain Control -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.1); padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(0,242,234,0.3);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 700;">🔗 تحكم
-                                    مدمج (Combined Control)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:8px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">X (Bend)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Left', 'x', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">Y (Twist)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Left', 'y', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <label style="font-size:0.8rem;">Z (Roll)</label>
-                                    <input type="range" style="width:70%"
-                                        oninput="manualManager.updateCombined('Left', 'z', this.value)" min="-3.14"
-                                        max="3.14" step="0.1" value="0">
-                                </div>
+                        <div class="highlight-box">
+                            <label data-ar="🔗 تحكم مدمج (Combined Control)" data-en="🔗 Combined Control">🔗 تحكم مدمج
+                                (Combined Control)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Bend</span><input
+                                        type="range" oninput="manualManager.updateCombined('Left', 'x', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Twist</span><input
+                                        type="range" oninput="manualManager.updateCombined('Left', 'y', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
+                                <div class="flex-row"><span style="width:60px; font-size:0.8rem">Roll</span><input
+                                        type="range" oninput="manualManager.updateCombined('Left', 'z', this.value)"
+                                        min="-3.14" max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <!-- Arm + Elbow Combined -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(0,242,234,0.2);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 600;">💪 ذراع +
-                                    مرفق (Arm + Elbow)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="display:flex; align-items:center;"><span style="width:20px">X</span><input
-                                        type="range" style="flex:1"
+                        <div class="highlight-box">
+                            <label data-ar="💪 ذراع + مرفق (Arm + Elbow)" data-en="💪 Arm + Elbow">💪 ذراع + مرفق (Arm +
+                                Elbow)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span>X</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Left', 'x', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Y</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Y</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Left', 'y', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Z</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Z</span><input type="range"
                                         oninput="manualManager.updateArmElbow('Left', 'z', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <!-- Elbow + Wrist Combined -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(0,242,234,0.2);">
-                            <div class="label-box"><label style="color: var(--neon-teal); font-weight: 600;">✋ مرفق +
-                                    معصم (Elbow + Wrist)</label></div>
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="display:flex; align-items:center;"><span style="width:20px">X</span><input
-                                        type="range" style="flex:1"
+                        <div class="highlight-box">
+                            <label data-ar="✋ مرفق + معصم (Elbow + Wrist)" data-en="✋ Elbow + Wrist">✋ مرفق + معصم
+                                (Elbow + Wrist)</label>
+                            <div class="flex-col">
+                                <div class="flex-row"><span>X</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Left', 'x', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Y</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Y</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Left', 'y', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
-                                <div style="display:flex; align-items:center;"><span style="width:20px">Z</span><input
-                                        type="range" style="flex:1"
+                                <div class="flex-row"><span>Z</span><input type="range"
                                         oninput="manualManager.updateElbowWrist('Left', 'z', this.value)" min="-3.14"
                                         max="3.14" step="0.1" value="0"></div>
                             </div>
                         </div>
 
                         <div class="control-row">
-                            <div class="label-box"><label>الكتف (Shoulder 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="الكتف (Shoulder 360°)"
+                                    data-en="Shoulder (360°)">الكتف (Shoulder 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="LeftArm" data-axis="x" min="-3.14"
                                     max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="LeftArm" data-axis="y" min="-3.14"
@@ -876,17 +971,19 @@
                                     max="3.14" step="0.1" value="0" title="Z">
                             </div>
                         </div>
+
                         <!-- Hand Chain Control -->
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.08); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-                            <div class="label-box"><label style="color: var(--neon-teal);">🔗 سلسلة اليد (Hand
-                                    Chain)</label></div>
+                        <div class="highlight-box">
+                            <label data-ar="🔗 سلسلة اليد (Hand Chain)" data-en="🔗 Hand Chain">🔗 سلسلة اليد (Hand
+                                Chain)</label>
                             <input type="range" oninput="manualManager.updateHandChain('Left', this.value)" min="-3.14"
                                 max="3.14" step="0.1" value="0">
                         </div>
+
                         <div class="control-row">
-                            <div class="label-box"><label>المرفق (Forearm 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="المرفق (Forearm 360°)"
+                                    data-en="Forearm (360°)">المرفق (Forearm 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="LeftForeArm" data-axis="x"
                                     min="-3.14" max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="LeftForeArm" data-axis="y"
@@ -895,9 +992,11 @@
                                     min="-3.14" max="3.14" step="0.1" value="0" title="Z">
                             </div>
                         </div>
+
                         <div class="control-row">
-                            <div class="label-box"><label>المعصم (Wrist 360°)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="المعصم (Wrist 360°)" data-en="Wrist (360°)">المعصم
+                                    (Wrist 360°)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="LeftHand" data-axis="x" min="-3.14"
                                     max="3.14" step="0.1" value="0" title="X">
                                 <input type="range" class="bone-control" data-bone="LeftHand" data-axis="y" min="-3.14"
@@ -910,32 +1009,34 @@
                 </div>
 
                 <!-- LEFT FINGERS -->
-                <div class="control-group collapsed">
+                <div class="control-group">
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">🖐️ أصابع اليد اليسرى</span>
+                        <span class="title" data-ar="🖐️ أصابع اليد اليسرى" data-en="🖐️ Left Fingers">🖐️ أصابع اليد
+                            اليسرى</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
-                        <div class="control-row"
-                            style="background: rgba(0,242,234,0.05); padding: 10px; border-radius: 12px;">
-                            <div class="label-box"><label style="color: var(--neon-teal);">✊ Fist Mastery</label></div>
+                        <div class="highlight-box">
+                            <label>✊ Fist Mastery (Left)</label>
                             <input type="range" oninput="manualManager.updateFist('Left', this.value)" min="0" max="1"
                                 step="0.05" value="0">
                         </div>
-                        <div id="left-fingers-ui"></div>
+                        <div id="left-fingers-ui" class="fingers-grid"></div>
                     </div>
                 </div>
 
                 <!-- HEAD & NECK -->
                 <div class="control-group collapsed">
                     <div class="group-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                        <span class="title">👤 الرأس والرقبة (Head & Neck)</span>
+                        <span class="title" data-ar="👤 الرأس والرقبة (Head & Neck)" data-en="👤 Head & Neck">👤 الرأس
+                            والرقبة (Head & Neck)</span>
                         <span class="chevron">▼</span>
                     </div>
                     <div class="group-body">
                         <div class="control-row">
-                            <div class="label-box"><label>الرقبة (Neck 3D)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="الرقبة (Neck 3D)" data-en="Neck (3D)">الرقبة (Neck
+                                    3D)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="Neck" data-axis="x" min="-1" max="1"
                                     step="0.1" value="0" title="Bend">
                                 <input type="range" class="bone-control" data-bone="Neck" data-axis="y" min="-1" max="1"
@@ -945,8 +1046,9 @@
                             </div>
                         </div>
                         <div class="control-row">
-                            <div class="label-box"><label>الرأس (Head 3D)</label></div>
-                            <div style="display:flex; gap:8px;">
+                            <div class="label-box"><label data-ar="الرأس (Head 3D)" data-en="Head (3D)">الرأس (Head
+                                    3D)</label></div>
+                            <div class="flex-row">
                                 <input type="range" class="bone-control" data-bone="Head" data-axis="x" min="-1" max="1"
                                     step="0.1" value="0" title="Bend">
                                 <input type="range" class="bone-control" data-bone="Head" data-axis="y" min="-1" max="1"
@@ -963,14 +1065,15 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                     <button class="t-btn danger" style="width: 100%; height: auto; padding: 12px;"
                         onclick="manualManager.resetAll()">
-                        🔄 إعادة ضبط (Reset All)
+                        <span data-ar="🔄 إعادة ضبط (Reset All)" data-en="🔄 Reset All">🔄 إعادة ضبط (Reset All)</span>
                     </button>
                     <input type="checkbox" id="mirror-mode" style="display:none;" onchange="/* logic in manager */">
                 </div>
                 <input type="text" id="anim-name-en" placeholder="Animation Name (English)" class="premium-input">
                 <input type="text" id="anim-name-ar" placeholder="اسم الحركة (عربي)" class="premium-input"
                     style="text-align: right;">
-                <button class="premium-btn-save" onclick="saveAnimation()">Save Animation | حفظ الحركة</button>
+                <button class="premium-btn-save" onclick="saveAnimation()" data-ar="حفظ الحركة"
+                    data-en="Save Animation">Save Animation | حفظ الحركة</button>
             </div>
         </div>
 
@@ -980,7 +1083,8 @@
                 <a href="welcome.html" class="premium-btn-back"><span>🏠</span> القائمة الرئيسية</a>
             </div>
 
-            <a-scene embedded vr-mode-ui="enabled: false" shadow="type: pcfsoft">
+            <a-scene embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"
+                shadow="type: pcfsoft" transparent="true">
                 <a-assets>
                     <a-asset-item id="ground-tex" src="https://cdn.aframe.io/a-painter/images/floor.jpg"></a-asset-item>
                 </a-assets>
@@ -993,37 +1097,19 @@
                 <a-entity light="type: point; color: #ff0050; intensity: 0.5; distance: 10"
                     position="-2 2 2"></a-entity>
 
-                <a-sky id="scene-sky" color="#0d0d1a"></a-sky> <!-- Synced Background (Dark Mode) -->
-
-                <script>
-                    // Sync 3D Sky with Theme
-                    window.addEventListener('themeChanged', (e) => {
-                        const sky = document.getElementById('scene-sky');
-                        if (sky) {
-                            // Light Mode: #f0f2f5 (Matches CSS --bg-primary), Dark Mode: #0d0d1a
-                            sky.setAttribute('color', e.detail.theme === 'light' ? '#f0f2f5' : '#0d0d1a');
-                        }
-                    });
-
-                    // Initial Check (in case loaded late)
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const currentTheme = localStorage.getItem('theme') || 'dark';
-                        const theme = localStorage.getItem('theme') || 'dark';
-                        const sky = document.getElementById('recorder-sky');
-                        const ground = document.getElementById('recorder-ground');
-                        const color = theme === 'light' ? '#cbd5e1' : '#1a1a2e';
-
-                        if (sky) sky.setAttribute('color', color);
-                        if (ground) ground.setAttribute('color', color);
-                    });
-                </script>
+                <!-- 
+                     Transparency Fix: 
+                     Removed <a-sky> completely to let CSS background show through.
+                     This guarantees a perfect color match.
+                -->
 
                 <!-- Ground: Synced with Background -->
                 <a-grid id="ground-grid"
-                    material="src: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqFHtRxIwNQMmAYSEgwkAMssX/w+uMzAAAAAASUVORK5CYII=); repeat: 50 50"
+                    material="src: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqFHtRxIwNQMmAYSEgwkAMssX/w+uMzAAAAAASUVORK5CYII=); repeat: 50 50; transparent: true; opacity: 0.05"
                     rotation="-90 0 0" width="100" height="100" position="0 -1.01 0">
                 </a-grid>
-                <a-plane id="recorder-ground" rotation="-90 0 0" width="100" height="100" color="#1a1a2e"
+                <!-- Recorder Ground is also removed/invisible to support transparency -->
+                <a-plane id="recorder-ground" rotation="-90 0 0" width="100" height="100" color="#050508" opacity="0"
                     position="0 -1.02 0"></a-plane>
                 <a-gltf-model position="0 -1.1 -1" src="avatars/male.glb" id="avatar" scale="1.7 1.7 1.7"
                     shadow="receive: true; cast: true"></a-gltf-model>
@@ -1056,117 +1142,135 @@
     <script>
         function generateFingerUI(hand) {
             const fingers = [
-                { id: 'Thumb', name: hand === 'Right' ? 'إبهام (يمين)' : 'إبهام (يسار)', icon: '👍' },
-                { id: 'Index', name: hand === 'Right' ? 'سبابة (يمين)' : 'سبابة (يسار)', icon: '☝️' },
-                { id: 'Middle', name: hand === 'Right' ? 'وسطى (يمين)' : 'وسطى (يسار)', icon: '🖕' },
-                { id: 'Ring', name: hand === 'Right' ? 'بنصر (يمين)' : 'بنصر (يسار)', icon: '💍' },
-                { id: 'Pinky', name: hand === 'Right' ? 'خنصر (يمين)' : 'خنصر (يسار)', icon: '🤙' }
+                { id: 'Thumb', ar: 'إبهام', en: 'Thumb', icon: '👍' },
+                { id: 'Index', ar: 'سبابة', en: 'Index', icon: '☝️' },
+                { id: 'Middle', ar: 'وسطى', en: 'Middle', icon: '🖕' },
+                { id: 'Ring', ar: 'بنصر', en: 'Ring', icon: '💍' },
+                { id: 'Pinky', ar: 'خنصر', en: 'Pinky', icon: '🤙' }
             ];
 
-            return fingers.map(f => `
-                <div class="finger-container" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
-                    <div class="group-header smaller" onclick="this.nextElementSibling.classList.toggle('hidden')" style="cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom: 5px;">
-                        <span style="font-size:1.1rem;">${f.icon}</span>
-                        <span style="font-size:0.85rem; font-weight:600; color:#ccc;">${f.name}</span>
-                        <span style="font-size:0.7rem; opacity:0.5; margin-right:auto;">انقر للتفصيل ▼</span>
-                    </div>
-                    <div class="finger-details hidden">
-                        <!-- Segment 1 (Knuckle) -->
-                        <div class="control-row segment-row">
-                            <label>المفصل 1 (الأساسي)</label>
-                            <div style="display:flex; gap:5px;">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_x_idx_1" min="-2" max="2" step="0.1" value="0" title="X">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_y_idx_1" min="-1.5" max="1.5" step="0.1" value="0" title="Y">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_z_idx_1" min="-1.5" max="1.5" step="0.1" value="0" title="Z">
+            const tabsHtml = fingers.map((f, i) => `
+                <button class="tab-btn ${i === 0 ? 'active' : ''}" 
+                    onclick="switchFingerTab('${hand}', '${f.id}', this)"
+                    title="${f.en}">
+                    <span style="font-size: 1.1rem;">${f.icon}</span>
+                    <span style="font-size: 0.75rem;">${globalUI.currentLang === 'ar' ? f.ar : f.en}</span>
+                </button>
+            `).join('');
+
+            const contentsHtml = fingers.map((f, i) => `
+                <div id="tab-${hand}-${f.id}" class="tab-content ${i === 0 ? 'active' : ''}">
+                    <div class="finger-card" style="margin-top: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px;">
+                        <div class="finger-header" style="display:flex; align-items:center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:1.4rem;">${f.icon}</span>
+                                <span style="font-size:1rem; font-weight:700; color: #00f2ea;">${globalUI.currentLang === 'ar' ? f.ar : f.en}</span>
                             </div>
+                            <button class="t-btn danger mini" onclick="resetFinger('${hand}', '${f.id}', this)">Reset</button>
                         </div>
-                        <!-- Segment 2 (Middle) -->
-                        <div class="control-row segment-row">
-                            <label>المفصل 2 (الأوسط)</label>
-                            <div style="display:flex; gap:5px;">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_x_idx_2" min="-2" max="2" step="0.1" value="0" title="X">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_y_idx_2" min="-1.5" max="1.5" step="0.1" value="0" title="Y">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_z_idx_2" min="-1.5" max="1.5" step="0.1" value="0" title="Z">
+                        
+                        <div class="joint-controls">
+                            ${[1, 2, 3].map(j => `
+                                <div class="joint-item" style="margin-bottom: 12px;">
+                                    <div style="font-size: 0.7rem; color: #888; margin-bottom: 6px; font-weight: 600;">
+                                        ${globalUI.currentLang === 'ar' ? 'المفصل' : 'Joint'} ${j}
+                                    </div>
+                                    <div class="axes-grid" style="display:grid; grid-template-columns: 1fr; gap: 8px;">
+                                        <!-- X Axis -->
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <b style="color:#ff4d4d; font-size:0.75rem; width:12px;">X</b>
+                                            <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_x_idx_${j}" min="-3.14" max="3.14" step="0.1" value="0" style="flex:1;"
+                                                oninput="manualManager.updateFinger('${hand}','${f.id}','k_x_idx_${j}',this.value); this.nextElementSibling.innerText=this.value;">
+                                            <span class="value-badge mini" style="min-width:38px; text-align:center; background: rgba(255,77,77,0.1); color: #ff4d4d;">0</span>
+                                        </div>
+                                        <!-- Y Axis -->
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <b style="color:#4dff4d; font-size:0.75rem; width:12px;">Y</b>
+                                            <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_y_idx_${j}" min="-3.14" max="3.14" step="0.1" value="0" style="flex:1;"
+                                                oninput="manualManager.updateFinger('${hand}','${f.id}','k_y_idx_${j}',this.value); this.nextElementSibling.innerText=this.value;">
+                                            <span class="value-badge mini" style="min-width:38px; text-align:center; background: rgba(77,255,77,0.1); color: #4dff4d;">0</span>
+                                        </div>
+                                        <!-- Z Axis -->
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <b style="color:#4d4dff; font-size:0.75rem; width:12px;">Z</b>
+                                            <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_z_idx_${j}" min="-3.14" max="3.14" step="0.1" value="0" style="flex:1;"
+                                                oninput="manualManager.updateFinger('${hand}','${f.id}','k_z_idx_${j}',this.value); this.nextElementSibling.innerText=this.value;">
+                                            <span class="value-badge mini" style="min-width:38px; text-align:center; background: rgba(77,77,255,0.1); color: #4d4dff;">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            <div style="margin-top: 15px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1);">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                                    <label style="font-size:0.8rem; color:#00f2ea;">${globalUI.currentLang === 'ar' ? 'قبضة (Curl)' : 'Full Curl'}</label>
+                                    <span class="value-badge mini" style="background: rgba(0,242,234,0.1); color:#00f2ea;">0</span>
+                                </div>
+                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="curl" min="0" max="1" step="0.05" value="0" style="width:100%" 
+                                    oninput="manualManager.updateFinger('${hand}','${f.id}','curl',this.value); this.previousElementSibling.querySelector('.value-badge').innerText=this.value;">
                             </div>
-                        </div>
-                        <!-- Segment 3 (Tip) -->
-                        <div class="control-row segment-row">
-                            <label>المفصل 3 (الطرفي)</label>
-                            <div style="display:flex; gap:5px;">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_x_idx_3" min="-2" max="2" step="0.1" value="0" title="X">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_y_idx_3" min="-1.5" max="1.5" step="0.1" value="0" title="Y">
-                                <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="k_z_idx_3" min="-1.5" max="1.5" step="0.1" value="0" title="Z">
-                            </div>
-                        </div>
-                        <div class="control-row" style="margin-top:5px; padding-top:5px; border-top: 1px dotted rgba(255,255,255,0.1);">
-                            <div class="label-box"><label>إغلاق مجمع (Chain Curl)</label></div>
-                            <input type="range" class="finger-control" data-hand="${hand}" data-finger="${f.id}" data-type="curl" min="0" max="1" step="0.05" value="0">
                         </div>
                     </div>
                 </div>
             `).join('');
-        }
-        document.getElementById('right-fingers-ui').innerHTML = generateFingerUI('Right');
 
-        const leftFingersContainer = document.getElementById('left-fingers-ui');
-        if (leftFingersContainer) {
-            leftFingersContainer.innerHTML = generateFingerUI('Left');
+            return `
+                <div class="finger-tabs-container">
+                    <div class="tabs-header">${tabsHtml}</div>
+                    <div class="tabs-body">${contentsHtml}</div>
+                </div>
+            `;
         }
 
-        // Value Badge Updater
+        function switchFingerTab(hand, fingerId, btn) {
+            const container = btn.closest('.finger-tabs-container');
+            // Deactivate all
+            container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Activate selection
+            btn.classList.add('active');
+            container.querySelector('#tab-' + hand + '-' + fingerId).classList.add('active');
+        }
+
+        function resetFinger(hand, fingerId, btn) {
+            const card = btn.closest('.finger-card');
+            card.querySelectorAll('input').forEach(i => {
+                i.value = 0;
+                i.dispatchEvent(new Event('input'));
+            });
+        }
+
+        function initFingersUI() {
+            const rightContainer = document.getElementById('right-fingers-ui');
+            if (rightContainer) {
+                console.log("Generating Right Fingers UI...");
+                rightContainer.innerHTML = generateFingerUI('Right');
+            }
+
+            const leftContainer = document.getElementById('left-fingers-ui');
+            if (leftContainer) {
+                console.log("Generating Left Fingers UI...");
+                leftContainer.innerHTML = generateFingerUI('Left');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFingersUI);
+        } else {
+            initFingersUI();
+        }
+
+        // Value Badge Updater (General for other range inputs)
         document.addEventListener('input', (e) => {
-            if (e.target.type === 'range') {
+            if (e.target.type === 'range' && !e.target.classList.contains('finger-control')) {
                 const badge = e.target.parentElement.querySelector('.value-badge');
                 if (badge) badge.innerText = e.target.value;
             }
         });
     </script>
-    <style>
-        .hidden {
-            display: none !important;
-        }
-
-        .segment-row {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 5px !important;
-            border-radius: 8px;
-            margin-bottom: 5px;
-        }
-
-        .segment-row label {
-            font-size: 0.75rem;
-            color: #888;
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        .finger-details {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            margin-top: 5px;
-        }
-    </style>
 
     <script type="module" src="./src/ManualAvatarManager.js"></script>
-    <script src="src/global-ui.js"></script>
-    <script>
-        // Global Transform Logic (Compact Bar)
-        function updateGlobal(type, axis, value) {
-            const avatar = document.getElementById('male');
-            if (!avatar) return;
-
-            const val = parseFloat(value);
-            if (type === 'scale') {
-                avatar.setAttribute('scale', `${val} ${val} ${val}`);
-            } else if (type === 'rot') {
-                const r = avatar.getAttribute('rotation');
-                r[axis] = val;
-                avatar.setAttribute('rotation', r);
-            }
-        }
-        window.updateGlobal = updateGlobal;
-    </script>
+    <script src="src/global-ui.js"></script> <!-- Redundant but kept for safety if order is forced elsewhere -->
 </body>
 
 </html>

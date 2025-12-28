@@ -127,9 +127,7 @@ yemeni-sign-language/
 
 ---
 
-## 🤝 المساهمة | Contributing
 
-نرحب بمساهماتكم! يرجى فتح Issue أو Pull Request.
 
 ## 📄 الترخيص | License
 
